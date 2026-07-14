@@ -1,0 +1,6 @@
+@TerrraLink.Api_HostAddress = http://localhost:5031
+
+GET {{TerrraLink.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
