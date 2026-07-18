@@ -1,0 +1,7 @@
+GET http://localhost:5031
+
+###
+GET http://localhost:5031/users
+
+###
+GET http://localhost:5031/users/1
