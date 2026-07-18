@@ -1,4 +1,4 @@
-namespace TerrraLink.Api.DTOs;
+namespace TerraLink.Api.DTOs;
 
 //A DTO (Data Transfer Object) is a simple object that is used to transfer data between different layers of an application. 
 //It typically contains only the data that needs to be transferred, without any business logic or behavior.
