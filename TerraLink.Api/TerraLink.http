@@ -32,3 +32,6 @@ Content-Type: application/json
     "Role": "Admin",
     "Status": "Active"
 }
+
+###
+DELETE http://localhost:5031/users/2

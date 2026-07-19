@@ -122,5 +122,11 @@ app.MapPut("/users/{id}", (int id, UpdateUserDto updatedUser) =>
 
 });
 
+app.MapDelete("/users/{id}", (int id) =>
+{  
+    int removedCount = users.RemoveAll(user => user.Id == id);
+    return removedCount >0  ? Results.NoContent() : Results.NotFound();
+
+});
 
 app.Run();
