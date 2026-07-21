@@ -65,8 +65,12 @@ app.MapGet("/users", ()=> users);
 
 
 //GET /users/{id}
-app.MapGet("/users/{id}", (long id)=> users.Find(user => user.Id==id))
-.WithName(GetUserEndpointName);
+app.MapGet("/users/{id}", (long id)=>
+{
+    var user = users.Find(user => user.Id == id);
+    return user is null? Results.NotFound() : Results.Ok(user);
+}
+).WithName(GetUserEndpointName);
 
 
 //POST /game
