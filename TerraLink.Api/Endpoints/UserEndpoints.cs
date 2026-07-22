@@ -6,7 +6,7 @@ namespace TerraLink.Api.Endpoints
     {
         const string GetUserEndpointName = "GetUser";
 
-        static readonly List<UserDto> users = [
+        private static readonly List<UserDto> users = [
             new(
                 1,
                 "TL-001",
@@ -42,24 +42,27 @@ namespace TerraLink.Api.Endpoints
 
         public static void MapUserEndpoints(this WebApplication app)
         {
+
+            var usersBasePath = app.MapGroup("/users"); // Route group base path for users.
+
             //GET /
             app.MapGet("/", () => "Hello World!");
 
             //GET /users
-            app.MapGet("/users", () => users);
+            usersBasePath.MapGet("/", () => users);
 
 
             //GET /users/{id}
-            app.MapGet("/users/{id}", (long id) =>
+            usersBasePath.MapGet("/{id}", (long id) =>
             {
                 var user = users.Find(user => user.Id == id);
-                return user is null ? Results.NotFound() : Results.Ok();
+                return user is null ? Results.NotFound() : Results.Ok(user);
             }
             ).WithName(GetUserEndpointName);
 
 
-            //POST /game
-            app.MapPost("/users", (CreateUserDto newUser) =>
+            //POST /user
+            usersBasePath.MapPost("/", (CreateUserDto newUser) =>
             {
                 UserDto user = new(
                     users.Count + 1,
@@ -73,7 +76,7 @@ namespace TerraLink.Api.Endpoints
                     false,
                     "",
                     null,
-                    DateTime.UtcNow,
+                    DateTime.UtcNow,   
                     null
                 );
 
@@ -84,7 +87,7 @@ namespace TerraLink.Api.Endpoints
             });
 
             //PUT /users/{id}
-            app.MapPut("/users/{id}", (int id, UpdateUserDto updatedUser) =>
+            usersBasePath.MapPut("/{id}", (int id, UpdateUserDto updatedUser) =>
             {
                 int index = users.FindIndex(user => user.Id == id);
 
@@ -111,7 +114,7 @@ namespace TerraLink.Api.Endpoints
 
             });
 
-            app.MapDelete("/users/{id}", (int id) =>
+            usersBasePath.MapDelete("/{id}", (int id) =>
             {
                 int removedCount = users.RemoveAll(user => user.Id == id);
                 return removedCount > 0 ? Results.NoContent() : Results.NotFound();
