@@ -1,12 +1,14 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TerraLink.Api.Models;
+
+[Table("Clients")]
 public class Client
 {
     public long Id { get; set; }
 
     [MaxLength(20)]
-    [Index(nameof(ClientNo), IsUnique = true)]
     public string? ClientNo { get; set; }
 
     public long UserId { get; set; }
@@ -22,14 +24,16 @@ public class Client
     public required string Phone { get; set; }
 
     public required DateTime DateOfBirth { get; set; }
+
     public required Gender gender { get; set; }
 
     public long? RegisteredById { get; set; }
-    public User? RegisteredBy { get; set; } 
+    public User? RegisteredBy { get; set; }
 
     public long? VerifiedById { get; set; }
     public User? VerifiedBy { get; set; }
-    public DateTime VerifiedAt { get; set; }
+
+    public DateTime? VerifiedAt { get; set; }
 
     public enum Gender
     {
@@ -37,5 +41,4 @@ public class Client
         Female,
         Other
     }
-
 }
