@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TerraLink.Api.Models;
 
-[Table("Roles")]
 public class Role
 {
     public long Id {get; set;}

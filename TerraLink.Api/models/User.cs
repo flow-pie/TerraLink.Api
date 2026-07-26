@@ -4,17 +4,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TerraLink.Api.Models;
 
-[Table("Users")]
 public class User
 {
     public long Id { get; set; }
 
     [MaxLength(20)]
-    [Index(nameof(Username), IsUnique = true)]
     public string? Username { get; set; } //can be phone number or employee id or email
 
     [MaxLength(120)]
-    [Index(nameof(Email), IsUnique = true)]
     public string? Email { get; set; }
 
     [MaxLength(255)]

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TerraLink.Api.Models;
 
-[Table("Clients")]
 public class Client
 {
     public long Id { get; set; }
