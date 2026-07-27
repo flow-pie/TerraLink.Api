@@ -29,6 +29,7 @@ Content-Type: application/json
     "Email": "alice.smith@example.com",
     "Phone": "987-654-3210",
     "Password": "newpassword456",
+
     "Role": "Admin",
     "Status": "Active"
 }
