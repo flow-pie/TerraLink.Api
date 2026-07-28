@@ -9,5 +9,5 @@ public record CreateUserDto(
     [Phone]string Phone,
     [StringLength(100), Required]string Password,
     [StringLength(50), Required]string Role,
-    [StringLength(20), Required]string Status
+    [StringLength(20), Required]string Status   
 );
