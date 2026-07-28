@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using TerraLink.Api.Data;
 using TerraLink.Api.Endpoints;
+using TerraLink.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +12,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddMySql<TerraLink.Api.Data.TerraLinkDbContext>("server=localhost;port=3306;password=;user=root;database=TerraLink", new MySqlServerVersion(new Version(8, 0, 32)));
+builder.Services.AddMySql<TerraLink.Api.Data.TerraLinkDbContext>(
+    "server=localhost;port=3306;password=;user=root;database=TerraLink",
+    new MySqlServerVersion(new Version(8, 0, 32))
+);
 
 var app = builder.Build();  
 
