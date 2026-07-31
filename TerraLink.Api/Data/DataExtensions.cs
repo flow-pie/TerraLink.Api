@@ -16,9 +16,9 @@ namespace TerraLink.Api.Data
                
                 // Seed initial data
                 context.Set<Models.Role>().AddRange(
-                    new Models.Role { Name = "Admin", Description = "Administrator" },
-                    new Models.Role { Name = "Client", Description = "Regular User" },
-                    new Models.Role { Name = "Loan Officer", Description = "Loan Officer" }
+                    new Models.Role { Name = "Admin", Description = "System Administrator" },
+                    new Models.Role { Name = "Client", Description = "Self-service access to loan applications, repayments, and account history." },
+                    new Models.Role { Name = "Loan Officer", Description = "Full access to client management, appraisal, and disbursement workflows." }
                 );
 
                 context.SaveChanges();

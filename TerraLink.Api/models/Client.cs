@@ -10,11 +10,14 @@ public class Client
     [MaxLength(20)]
     public string? ClientNo { get; set; }
 
+    // Linked login account. NULL for an officer-registered client who
+    // has not yet installed the app; always populated for SELF channel.
     public long UserId { get; set; }
+    [ForeignKey(nameof(UserId))]
     public User User { get; set; } = null!;
 
     [MaxLength(120)]
-    public required string ClientName { get; set; }
+    public required string FullName { get; set; }
 
     [MaxLength(8)]
     public required string NationalId { get; set; }
@@ -26,18 +29,29 @@ public class Client
 
     public required Gender gender { get; set; }
 
-    public long? RegisteredById { get; set; }
-    public User? RegisteredBy { get; set; }
+    public required string Address { get; set; }
 
-    public long? VerifiedById { get; set; }
-    public User? VerifiedBy { get; set; }
+    public long? GroupId { get; set; }
+
+    [Required]
+    public RegistrationChannel RegistrationChannel { get; set; }
+
+    // Officer who performed registration; NULL for self-registration.
+    public long? RegisteredBy { get; set; }
+
+    [ForeignKey(nameof(RegisteredBy))]
+    public User? RegisteredByUser { get; set; }
+
+    [Required]
+    public VerificationStatus VerificationStatus { get; set; } = VerificationStatus.PENDING;
+
+    // Officer who approved verification, where applicable.
+    public long? VerifiedBy { get; set; }
+
+    [ForeignKey(nameof(VerifiedBy))]
+    public User? VerifiedByUser { get; set; }
 
     public DateTime? VerifiedAt { get; set; }
 
-    public enum Gender
-    {
-        Male,
-        Female,
-        Other
-    }
+    public ClientStatus Status { get; set; } = ClientStatus.ACTIVE;
 }

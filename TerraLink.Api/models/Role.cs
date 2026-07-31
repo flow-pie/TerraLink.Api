@@ -5,11 +5,14 @@ namespace TerraLink.Api.Models;
 
 public class Role
 {
-    public long Id {get; set;}
+    public long Id { get; set; }
 
     [MaxLength(50)]
-    public required string Name {get; set;}
-    
+    public required string Name { get; set; }
+
     [MaxLength(255)]
-    public string? Description {get; set;}
+    public string? Description { get; set; }
+
+    //Navigation Property
+    public ICollection<User> Users { get; set; } = new List<User>();
 }
