@@ -140,4 +140,22 @@ namespace TerraLink.Api.Models
         OTHER
     }
 
+    public enum NotificationType
+    {
+        CLIENT_VERIFICATION_PENDING,
+        LOAN_APPLICATION_SUBMITTED,
+        LOAN_APPROVED,
+        LOAN_REJECTED,
+        PAYMENT_DUE,
+        PAYMENT_RECEIVED,
+        PAYMENT_FAILED,
+        DISBURSEMENT_COMPLETED
+    }
+    public enum ReportFrequency
+    {
+        DAILY,
+        WEEKLY,
+        MONTHLY
+    }
+
 }
