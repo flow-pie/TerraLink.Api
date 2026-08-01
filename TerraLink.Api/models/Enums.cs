@@ -112,7 +112,7 @@ namespace TerraLink.Api.Models
         OVERDUE
     }
 
-        public enum PaymentMethod
+    public enum PaymentMethod
     {
         MPESA,
         CASH,
@@ -124,6 +124,20 @@ namespace TerraLink.Api.Models
         PENDING,
         SUCCESS,
         FAILED
+    }
+    public enum DisbursementStatus
+    {
+        PENDING,
+        SENT,
+        COMPLETED,
+        FAILED
+    }
+    public enum AssetType
+    {
+        LIVESTOCK,
+        MOTORBIKE,
+        WATER_PUMP,
+        OTHER
     }
 
 }
