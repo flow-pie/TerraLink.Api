@@ -105,6 +105,25 @@ namespace TerraLink.Api.Models
         DEFAULTED,
         WRITTEN_OFF
     }
+    public enum InstallmentStatus
+    {
+        PENDING,
+        PAID,
+        OVERDUE
+    }
 
+        public enum PaymentMethod
+    {
+        MPESA,
+        CASH,
+        BANK_TRANSFER
+    }
+
+    public enum PaymentStatus
+    {
+        PENDING,
+        SUCCESS,
+        FAILED
+    }
 
 }
