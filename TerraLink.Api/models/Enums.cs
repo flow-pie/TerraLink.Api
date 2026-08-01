@@ -68,4 +68,43 @@ namespace TerraLink.Api.Models
         ID_BACK,
         PASSPORT_PHOTO
     }
+
+    public enum RepaymentFrequency
+    {
+        WEEKLY,
+        BIWEEKLY,
+        MONTHLY
+    }
+
+    public enum LoanProductStatus
+    {
+        ACTIVE,
+        INACTIVE
+    }
+
+    public enum LoanApplicationStatus
+    {
+        SUBMITTED,
+        UNDER_REVIEW,
+        APPROVED,
+        REJECTED,
+        INFO_REQUESTED
+    }
+
+    public enum LoanDecision
+    {
+        APPROVED,
+        REJECTED,
+        INFO_REQUESTED
+    }
+
+    public enum LoanStatus
+    {
+        ACTIVE,
+        COMPLETED,
+        DEFAULTED,
+        WRITTEN_OFF
+    }
+
+
 }
