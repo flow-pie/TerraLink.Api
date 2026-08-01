@@ -42,4 +42,30 @@ namespace TerraLink.Api.Models
         ACTIVE,
         INACTIVE
     }
+
+    public enum MeetingFrequency
+    {
+        WEEKLY,
+        BIWEEKLY,
+        MONTHLY
+    }
+
+    public enum GroupHealthStatus
+    {
+        HEALTHY,
+        WATCHLIST
+    }
+
+    public enum GroupStatus
+    {
+        ACTIVE,
+        INACTIVE
+    }
+
+    public enum KycDocType
+    {
+        ID_FRONT,
+        ID_BACK,
+        PASSPORT_PHOTO
+    }
 }
