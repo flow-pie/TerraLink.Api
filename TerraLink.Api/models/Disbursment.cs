@@ -8,7 +8,7 @@ namespace TerraLink.Api.Models
     /// Records the release of approved loan funds to the client via M-Pesa.
     /// </summary>
     [Table("disbursements")]
-    public class Disbursement
+    public class Disbursment
     {
         [Key]
         [Column("id")]
