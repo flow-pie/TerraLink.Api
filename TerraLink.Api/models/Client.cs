@@ -12,9 +12,9 @@ public class Client
 
     // Linked login account. NULL for an officer-registered client who
     // has not yet installed the app; always populated for SELF channel.
-    public long UserId { get; set; }
-    [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = null!;
+    public long? UserId { get; set; }
+
+    public User? User { get; set; } = null!;
 
     [MaxLength(120)]
     public required string FullName { get; set; }
@@ -27,7 +27,7 @@ public class Client
 
     public required DateTime DateOfBirth { get; set; }
 
-    public required Gender gender { get; set; }
+    public required Gender Gender { get; set; }
 
     public required string Address { get; set; }
 
@@ -39,7 +39,7 @@ public class Client
     // Officer who performed registration; NULL for self-registration.
     public long? RegisteredBy { get; set; }
 
-    [ForeignKey(nameof(RegisteredBy))]
+
     public User? RegisteredByUser { get; set; }
 
     [Required]
@@ -48,7 +48,6 @@ public class Client
     // Officer who approved verification, where applicable.
     public long? VerifiedBy { get; set; }
 
-    [ForeignKey(nameof(VerifiedBy))]
     public User? VerifiedByUser { get; set; }
 
     public DateTime? VerifiedAt { get; set; }

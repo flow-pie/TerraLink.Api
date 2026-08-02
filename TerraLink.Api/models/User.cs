@@ -38,22 +38,26 @@ public class User : IValidatableObject
     //navigation when role==client
     public Client? Client { get; set; }
 
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        var isLoanOfficer = Role?.Name == "Loan Officer";
+    private const long LoanOfficerRoleId = 1;
 
-        if (isLoanOfficer && string.IsNullOrWhiteSpace(EmployeeNo))
+    public IEnumerable<ValidationResult> Validate(
+        ValidationContext validationContext)
+    {
+        var isLoanOfficer = RoleId == LoanOfficerRoleId;
+
+        if (isLoanOfficer &&
+            string.IsNullOrWhiteSpace(EmployeeNo))
         {
             yield return new ValidationResult(
-                "employee_no is required for users with the Loan Officer role.",
-                new[] { nameof(EmployeeNo) }
-            );
+                "Employee number is required for Loan Officers.",
+                new[] { nameof(EmployeeNo) });
         }
 
-        if (!isLoanOfficer && !string.IsNullOrWhiteSpace(EmployeeNo))
+        if (!isLoanOfficer &&
+            !string.IsNullOrWhiteSpace(EmployeeNo))
         {
             yield return new ValidationResult(
-                "employee_no must be NULL for users with the Client role.",
+                "Employee number must be empty for Clients.",
                 new[] { nameof(EmployeeNo) });
         }
     }
