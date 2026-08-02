@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TerraLink.Api.Models;
 
-namespace TerraLink.Models
+namespace TerraLink.Api.Models
 {
     /// <summary>
     /// Immutable log of all Loan Officer and Client actions across the

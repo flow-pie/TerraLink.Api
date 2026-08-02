@@ -1,8 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using TerraLink.Api.Models;
 
-namespace TerraLink.Models
+namespace TerraLink.Api.Models
 {
 
     /// <summary>
@@ -10,7 +9,7 @@ namespace TerraLink.Models
     /// registration channels.
     /// </summary>
 
-    public class KycDocs
+    public class KycDocument
     {
         [Key]
         [Column("id")]

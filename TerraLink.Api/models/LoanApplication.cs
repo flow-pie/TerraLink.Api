@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TerraLink.Api.Models;
 
-namespace TerraLink.Models
+namespace TerraLink.Api.Models
 {
     /// <summary>
     /// Tracks the application's position in the pipeline; set by the system

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TerraLink.Api.Models;
 
-namespace TerraLink.Models
+namespace TerraLink.Api.Models
 {
     /// <summary>
     /// Point-in-time snapshot of a client's monthly cash flow, captured

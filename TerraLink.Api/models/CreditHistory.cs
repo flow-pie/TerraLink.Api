@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using TerraLink.Api.Models;
 
-namespace TerraLink.Models
+namespace TerraLink.Api.Models
 {
     /// <summary>
     /// Historical record of a client's credit performance across loans,
