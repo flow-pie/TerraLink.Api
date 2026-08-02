@@ -25,30 +25,90 @@ public class TerraLinkDbContext(DbContextOptions<TerraLinkDbContext> options) : 
     public DbSet<Models.ReportSchedule> Reports => Set<Models.ReportSchedule>();
     public DbSet<Models.AuditLog> AuditLogs => Set<Models.AuditLog>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+   protected override void OnModelCreating(
+    ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
+
+    
+    // CLIENT RELATIONSHIPS
+    // =========================
+
+    modelBuilder.Entity<Models.Client>(entity =>
     {
-        base.OnModelCreating(modelBuilder);
+        // Client.UserId → User.Id
+        // Optional one-to-one relationship.
+        entity.HasOne(client => client.User)
+            .WithOne(user => user.Client)
+            .HasForeignKey<Models.Client>(
+                client => client.UserId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
 
-        modelBuilder.Entity<Models.Client>(entity =>
-        {
-            //Client account relationship with User account
-            entity.HasOne(client => client.User)
-                .WithOne(user => user.Client)
-                .HasForeignKey<Models.Client>(client => client.UserId)
-                .OnDelete(DeleteBehavior.SetNull);
+        // Client.RegisteredBy → User.Id
+        // One officer can register many clients.
+        entity.HasOne(
+                client => client.RegisteredByUser)
+            .WithMany()
+            .HasForeignKey(
+                client => client.RegisteredBy)
+            .OnDelete(DeleteBehavior.Restrict);
 
-            //officer who registered the client
-            entity.HasOne(client => client.RegisteredByUser)
-                .WithMany()
-                .HasForeignKey(client => client.RegisteredBy)
-                .OnDelete(DeleteBehavior.SetNull);
+        // Client.VerifiedBy → User.Id
+        // One officer can verify many clients.
+        entity.HasOne(
+                client => client.VerifiedByUser)
+            .WithMany()
+            .HasForeignKey(
+                client => client.VerifiedBy)
+            .OnDelete(DeleteBehavior.Restrict);
 
-            // Officer who verified the client:
-            // Client.VerifiedBy → User.Id
-            entity.HasOne(client => client.VerifiedByUser)
-                .WithMany()
-                .HasForeignKey(client => client.VerifiedBy)
-                .OnDelete(DeleteBehavior.SetNull);
-        });
-    }
+        // Store Client enums as strings.
+        entity.Property(client => client.Gender)
+            .HasConversion<string>()
+            .HasMaxLength(10);
+
+        entity.Property(
+                client => client.RegistrationChannel)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        entity.Property(
+                client => client.VerificationStatus)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        entity.Property(client => client.Status)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+    });
+
+   
+    // USER CONFIGURATION
+    // =========================
+
+    modelBuilder.Entity<Models.User>(entity =>
+    {
+        entity.Property(user => user.Status)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        // User.RoleId → Role.Id
+        // One role can belong to many users.
+        entity.HasOne(user => user.Role)
+            .WithMany(role => role.Users)
+            .HasForeignKey(user => user.RoleId)
+            .OnDelete(DeleteBehavior.Restrict);
+    });
+
+    // BRANCH CONFIGURATION    
+    // =========================
+
+    modelBuilder.Entity<Models.Branch>(entity =>
+    {
+        entity.Property(branch => branch.Status)
+            .HasConversion<string>()
+            .HasMaxLength(20);
+    });
+}
 }
