@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TerraLink.Api.Models;
 
@@ -14,7 +13,7 @@ public class Client
     // has not yet installed the app; always populated for SELF channel.
     public long? UserId { get; set; }
 
-    public User? User { get; set; } = null!;
+    public User? User { get; set; }
 
     [MaxLength(120)]
     public required string FullName { get; set; }
@@ -25,15 +24,14 @@ public class Client
     [MaxLength(10)]
     public required string Phone { get; set; }
 
-    public required DateTime DateOfBirth { get; set; }
+    public DateTime DateOfBirth { get; set; }
 
-    public required Gender Gender { get; set; }
+    public Gender Gender { get; set; }
 
     public required string Address { get; set; }
 
     public long? GroupId { get; set; }
 
-    [Required]
     public RegistrationChannel RegistrationChannel { get; set; }
 
     // Officer who performed registration; NULL for self-registration.
@@ -42,7 +40,6 @@ public class Client
 
     public User? RegisteredByUser { get; set; }
 
-    [Required]
     public VerificationStatus VerificationStatus { get; set; } = VerificationStatus.PENDING;
 
     // Officer who approved verification, where applicable.

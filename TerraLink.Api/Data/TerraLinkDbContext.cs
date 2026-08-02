@@ -33,7 +33,7 @@ public class TerraLinkDbContext(DbContextOptions<TerraLinkDbContext> options) : 
         {
             //Client account relationship with User account
             entity.HasOne(client => client.User)
-                .WithOne()
+                .WithOne(user => user.Client)
                 .HasForeignKey<Models.Client>(client => client.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
 

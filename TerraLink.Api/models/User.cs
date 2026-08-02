@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace TerraLink.Api.Models;
 
@@ -26,7 +24,7 @@ public class User : IValidatableObject
     // public long? BranchId {get; set;}
     // [ForeignKey(nameof(BranchId))]
     // public Branch Branch {get; set;}
-    public required UserStatus Status { get; set; } = UserStatus.ACTIVE;
+    public UserStatus Status { get; set; } = UserStatus.ACTIVE;
     public bool MfaEnabled { get; set; } = false;
 
     [MaxLength(255)]
@@ -38,7 +36,8 @@ public class User : IValidatableObject
     //navigation when role==client
     public Client? Client { get; set; }
 
-    private const long LoanOfficerRoleId = 1;
+    //NOTE Roles are seeded with fixed IDs, so we can use the RoleId to determine if a user is a loan officer or not.
+    private const long LoanOfficerRoleId = 3;
 
     public IEnumerable<ValidationResult> Validate(
         ValidationContext validationContext)
