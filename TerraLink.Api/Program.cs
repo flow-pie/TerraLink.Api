@@ -20,6 +20,15 @@ builder.Services.AddMySql<TerraLinkDbContext>(
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
+builder.Services.AddAuthentication().AddJwtBearer();   
+builder.Services.AddAuthorization(
+//    options =>
+//{
+//    options.AddPolicy("read:users", policy => policy.RequireClaim("scope", "read:users"));
+//    options.AddPolicy("write:users", policy => policy.RequireClaim("scope", "write:users"));
+//}
+);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,7 +39,8 @@ var app = builder.Build();
 
 // app.UseHttpsRedirection();
 
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 // app.MapControllers();
 
