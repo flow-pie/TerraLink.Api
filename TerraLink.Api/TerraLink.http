@@ -54,5 +54,15 @@ POST http://localhost:5031/api/auth/refresh
 Content-Type: application/json
 
 {
-    "refreshToken": "PASTE_TOKEN_FROM_LOGIN"
+    "refreshToken": "TOKEN_FROM_LOGIN"
+}
+
+###
+#logout
+POST http://localhost:5031/api/auth/logout
+Authorization: Bearer ACCESS_TOKEN_
+Content-Type: application/json
+
+{
+    "refreshToken": "REFRESH_TOKEN"
 }

@@ -78,19 +78,51 @@ namespace TerraLink.Api.Services.Auth
 
             return new LoginResult
             (
-                Status : LoginStatus.Success,
-                Response : new LoginResponse(
-                    AccessToken : accessToken,
-                    RefreshToken : refreshToken,
-                    ExpiresIn : 3600,
-                    User : new LoginUserResponse(
-                        Id : user.Id,
-                        RoleName : user.Role.Name
+                Status: LoginStatus.Success,
+                Response: new LoginResponse(
+                    AccessToken: accessToken,
+                    RefreshToken: refreshToken,
+                    ExpiresIn: 3600,
+                    User: new LoginUserResponse(
+                        Id: user.Id,
+                        RoleName: user.Role.Name
                     )
                 )
             );
         }
 
+        public async Task<bool> LogoutAsync(
+    long userId,
+    string refreshToken,
+    CancellationToken cancellationToken
+)
+        {
+            var tokenHash = jwtService.HashToken(
+                refreshToken
+            );
+
+            var storedToken = await dbContext.RefreshTokens
+                .SingleOrDefaultAsync(
+                    token =>
+                        token.UserId == userId &&
+                        token.TokenHash == tokenHash &&
+                        token.RevokedAt == null,
+                    cancellationToken
+                );
+
+            if (storedToken is null)
+            {
+                return false;
+            }
+
+            storedToken.RevokedAt = DateTime.UtcNow;
+
+            await dbContext.SaveChangesAsync(
+                cancellationToken
+            );
+
+            return true;
+        }
         public async Task<RefreshTokenResponse?> RefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken)
         {
             var tokenHash = jwtService.HashToken(
@@ -104,11 +136,11 @@ namespace TerraLink.Api.Services.Auth
                     token => token.TokenHash == tokenHash,
                     cancellationToken
                 );
-            
-            if(storedToken is null || !storedToken.IsActive)
+
+            if (storedToken is null || !storedToken.IsActive)
                 return null;
 
-            if(storedToken.User.Status != UserStatus.ACTIVE)
+            if (storedToken.User.Status != UserStatus.ACTIVE)
                 return null;
 
             var newRefreshToken = jwtService.GenerateRefreshToken();
@@ -137,7 +169,7 @@ namespace TerraLink.Api.Services.Auth
             );
 
             await dbContext.SaveChangesAsync(cancellationToken);
-            
+
             return new RefreshTokenResponse(
                 AccessToken: accessToken,
                 RefreshToken: newRefreshToken,

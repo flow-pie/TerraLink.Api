@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http.HttpResults;
 using TerraLink.Api.Common;
 using TerraLink.Api.DTOs.Auth;
@@ -19,7 +20,59 @@ namespace TerraLink.Api.Endpoints
             group.MapPost("/refresh", RefreshAsync)
                 .AllowAnonymous();
 
+            group.MapPost("/logout", LogoutAsync)
+                .RequireAuthorization();
+
             return endpoints;
+        }
+
+        //handler functions
+
+        private static async Task<
+    Results<
+        NoContent,
+        UnauthorizedHttpResult,
+        BadRequest<ErrorResponse>
+    >
+> LogoutAsync(
+    LogoutRequest request,
+    ClaimsPrincipal user,
+    IAuthService authService,
+    CancellationToken cancellationToken
+)
+        {
+            if (!ValidationHelper.TryValidate(
+                    request,
+                    out var validationErrors))
+            {
+                return TypedResults.BadRequest(
+                    validationErrors.ToErrorResponse()
+                );
+            }
+
+            var userIdClaim = user.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+            if (!long.TryParse(
+                    userIdClaim,
+                    out var userId))
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            var revoked = await authService.LogoutAsync(
+                userId,
+                request.RefreshToken,
+                cancellationToken
+            );
+
+            if (!revoked)
+            {
+                return TypedResults.Unauthorized();
+            }
+
+            return TypedResults.NoContent();
         }
 
         private static async Task<
