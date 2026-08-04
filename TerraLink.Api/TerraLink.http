@@ -47,3 +47,12 @@ Content-Type: application/json
     "identifier": "ML-8842",
     "password": "P@ssw0rd123"
 }
+
+###
+//refresh endpoint
+POST http://localhost:5031/api/auth/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "PASTE_TOKEN_FROM_LOGIN"
+}

@@ -91,5 +91,58 @@ namespace TerraLink.Api.Services.Auth
             );
         }
 
+        public async Task<RefreshTokenResponse?> RefreshTokenAsync(RefreshTokenRequest request, CancellationToken cancellationToken)
+        {
+            var tokenHash = jwtService.HashToken(
+                request.RefreshToken
+            );
+
+            var storedToken = await dbContext.RefreshTokens
+                .Include(token => token.User)
+                .ThenInclude(user => user.Role)
+                .SingleOrDefaultAsync(
+                    token => token.TokenHash == tokenHash,
+                    cancellationToken
+                );
+            
+            if(storedToken is null || !storedToken.IsActive)
+                return null;
+
+            if(storedToken.User.Status != UserStatus.ACTIVE)
+                return null;
+
+            var newRefreshToken = jwtService.GenerateRefreshToken();
+
+            var newRefreshTokenHash = jwtService.HashToken(
+                newRefreshToken
+            );
+
+            storedToken.RevokedAt = DateTime.UtcNow;
+
+            storedToken.ReplacedByTokenHash = newRefreshTokenHash;
+
+            var replacementToken = new RefreshToken
+            {
+                UserId = storedToken.UserId,
+                TokenHash = newRefreshToken,
+                ExpiresAt = jwtService.GetRefreshTokenExpiry()
+            };
+
+            dbContext.RefreshTokens.Add(
+                replacementToken
+            );
+
+            var accessToken = jwtService.GenerateAccessToken(
+                storedToken.User
+            );
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+            
+            return new RefreshTokenResponse(
+                AccessToken: accessToken,
+                RefreshToken: newRefreshToken,
+                ExpiresIn: 3600
+            );
+        }
     }
 }

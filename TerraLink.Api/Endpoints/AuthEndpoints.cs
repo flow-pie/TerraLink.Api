@@ -13,10 +13,43 @@ namespace TerraLink.Api.Endpoints
             var group = endpoints.MapGroup("api/auth")
                 .WithTags("Authentication");
 
-            group.MapPost("login",LoginAsync)
+            group.MapPost("login", LoginAsync)
                 .AllowAnonymous();
-            
-            return endpoints;            
+
+            group.MapPost("/refresh", RefreshAsync)
+                .AllowAnonymous();
+
+            return endpoints;
+        }
+
+        private static async Task<
+            Results<
+                Ok<RefreshTokenResponse>,
+                UnauthorizedHttpResult,
+                BadRequest<ErrorResponse>
+            >
+        > RefreshAsync(
+            RefreshTokenRequest request,
+            IAuthService authService,
+            CancellationToken cancellationToken
+        )
+        {
+            if (!ValidationHelper.TryValidate(
+            request,
+            out var validationErrors))
+            {
+                return TypedResults.BadRequest(
+                    validationErrors.ToErrorResponse()
+                );
+            }
+
+            var response =
+                await authService.RefreshTokenAsync(
+                    request,
+                    cancellationToken
+                );
+            return response is null
+                ? TypedResults.Unauthorized() : TypedResults.Ok(response);
         }
 
         public static async Task<
@@ -32,12 +65,12 @@ namespace TerraLink.Api.Endpoints
             CancellationToken cancellationToken
         )
         {
-            if(!ValidationHelper.TryValidate(
+            if (!ValidationHelper.TryValidate(
                 request,
                 out var validationErrors
             ))
             {
-                return TypedResults.BadRequest(validationErrors.ToErrorResponse() );
+                return TypedResults.BadRequest(validationErrors.ToErrorResponse());
             }
 
             var result = await authService.LoginAsync(
@@ -55,7 +88,7 @@ namespace TerraLink.Api.Endpoints
                 LoginStatus.InvalidCredentials
                     => TypedResults.Unauthorized(),
 
-                LoginStatus.AccountInactive 
+                LoginStatus.AccountInactive
                     => TypedResults.Forbid(),
 
                 LoginStatus.MfaRequired
