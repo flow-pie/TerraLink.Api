@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using TerraLink.Api.Data;
 using TerraLink.Api.Endpoints;
 using TerraLink.Api.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using TerraLink.Api.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,14 +24,42 @@ builder.Services.AddMySql<TerraLinkDbContext>(
 
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
-builder.Services.AddAuthentication().AddJwtBearer();   
-builder.Services.AddAuthorization(
-//    options =>
-//{
-//    options.AddPolicy("read:users", policy => policy.RequireClaim("scope", "read:users"));
-//    options.AddPolicy("write:users", policy => policy.RequireClaim("scope", "write:users"));
-//}
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection(
+        JwtOptions.SectionName
+        )
 );
+
+builder.Services.AddScoped<IJwtService, JwtService>();
+
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwtSection["Key"] ?? throw new InvalidOperationException("JWT Key not found in configuration.");
+var jwtIssuer = jwtSection["Issuer"] ?? throw new InvalidOperationException("JWT Issuer not found in configuration.");
+var jwtAudience = jwtSection["Audience"] ?? throw new InvalidOperationException("JWT Audience not found in configuration.");
+
+builder.Services
+    .AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ClockSkew = TimeSpan.Zero // Set clock skew to zero for immediate expiration
+    };
+});
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -44,6 +76,7 @@ app.UseAuthorization();
 
 // app.MapControllers();
 
+app.MapAuthEndpoints();
 app.MapUserEndpoints();
 
 //perform database migration on startup

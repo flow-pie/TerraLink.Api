@@ -20,12 +20,6 @@ namespace TerraLink.Api.Models
         [Column("name")]
         public string Name { get; set; } = null!;
 
-        [Column("branch_id")]
-        public long? BranchId { get; set; }
-
-        [ForeignKey(nameof(BranchId))]
-        public Branch? Branch { get; set; }
-
         [Column("meeting_frequency")]
         public MeetingFrequency? MeetingFrequency { get; set; }
 

@@ -7,8 +7,8 @@ public class User : IValidatableObject
     public long Id { get; set; }
 
     [MaxLength(20)]
-    public string? Username { get; set; } //can be phone number or employee id or email
-
+    public string? Username { get; set; }
+    // Client login identifier, typically a phone number or username.
     [MaxLength(120)]
     public string? Email { get; set; }
 
@@ -20,10 +20,6 @@ public class User : IValidatableObject
 
     public long RoleId { get; set; }
     public Role Role { get; set; } = null!;
-
-    // public long? BranchId {get; set;}
-    // [ForeignKey(nameof(BranchId))]
-    // public Branch Branch {get; set;}
     public UserStatus Status { get; set; } = UserStatus.ACTIVE;
     public bool MfaEnabled { get; set; } = false;
 
@@ -35,6 +31,9 @@ public class User : IValidatableObject
 
     //navigation when role==client
     public Client? Client { get; set; }
+
+    public ICollection<RefreshToken> RefreshTokens { get; set; }
+    = new List<RefreshToken>();
 
     //NOTE Roles are seeded with fixed IDs, so we can use the RoleId to determine if a user is a loan officer or not.
     private const long LoanOfficerRoleId = 3;

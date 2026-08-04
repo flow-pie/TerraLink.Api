@@ -30,7 +30,7 @@ namespace TerraLink.Api.Endpoints
 
 
             //GET /api/users?groupId=&page=&pageSize=
-            group.MapGet("/", () => GetUsers);
+            group.MapGet("/", GetUsers);
             //.RequireAuthorization(policy => policy.RequireRole(LoanOfficerRole)); TODO: Uncomment this line to require authorization for this endpoint.
 
 
@@ -46,6 +46,27 @@ namespace TerraLink.Api.Endpoints
 
             return group;
         }
+
+        private static async Task GetMe(HttpContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static async Task GetUsers(HttpContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static async Task GetUserById(HttpContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static async Task CreateOfficer(HttpContext context)
+        {
+            throw new NotImplementedException();
+        }
+
         //PUT /users/{id}
         // usersBasePath.MapPut("/{id}", (int id, UpdateUserDto updatedUser) =>
         //     {
