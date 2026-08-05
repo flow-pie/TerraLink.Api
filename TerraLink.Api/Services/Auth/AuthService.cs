@@ -92,10 +92,10 @@ namespace TerraLink.Api.Services.Auth
         }
 
         public async Task<bool> LogoutAsync(
-    long userId,
-    string refreshToken,
-    CancellationToken cancellationToken
-)
+            long userId,
+            string refreshToken,
+            CancellationToken cancellationToken
+        )
         {
             var tokenHash = jwtService.HashToken(
                 refreshToken
@@ -175,6 +175,131 @@ namespace TerraLink.Api.Services.Auth
                 RefreshToken: newRefreshToken,
                 ExpiresIn: 3600
             );
+        }
+
+        public async Task RequestPasswordResetAsync(
+            ForgotPasswordRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var identifier = request.Identifier.Trim();
+
+            var user = await dbContext.Users
+                .SingleOrDefaultAsync(
+                    user =>
+                        user.Username == identifier ||
+                        user.Email == identifier ||
+                        user.EmployeeNo == identifier,
+                    cancellationToken
+                );
+
+            // without revealing whether the account exists to prevent privacy leaks and attacks
+            if (user is null)
+            {
+                return;
+            }
+
+            // Invalidate unused reset tokens for this user.
+            var existingTokens =
+                await dbContext.PasswordResetTokens
+                    .Where(token =>
+                        token.UserId == user.Id &&
+                        token.UsedAt == null)
+                    .ToListAsync(cancellationToken);
+
+            foreach (var token in existingTokens)
+            {
+                token.UsedAt = DateTime.UtcNow;
+            }
+
+            var rawToken =
+                jwtService.GenerateRefreshToken();
+
+            var tokenHash =
+                jwtService.HashToken(rawToken);
+
+            var resetToken =
+                new PasswordResetToken
+                {
+                    UserId = user.Id,
+                    TokenHash = tokenHash,
+                    ExpiresAt =
+                        DateTime.UtcNow.AddMinutes(15)
+                };
+
+            dbContext.PasswordResetTokens.Add(
+                resetToken
+            );
+
+            await dbContext.SaveChangesAsync(
+                cancellationToken
+            );
+
+            // DEVELOPMENT ONLY. TODO : Replace with an email or sms
+            Console.WriteLine(
+                $"Password reset token for user " +
+                $"{user.Id}: {rawToken}"
+            );
+        }
+
+        public async Task<bool> ResetPasswordAsync(
+            ResetPasswordRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var tokenHash =
+                jwtService.HashToken(
+                    request.Token
+                );
+
+            var resetToken =
+                await dbContext.PasswordResetTokens
+                    .Include(token => token.User)
+                    .SingleOrDefaultAsync(
+                        token =>
+                            token.TokenHash == tokenHash,
+                        cancellationToken
+                    );
+
+            if (resetToken is null ||
+                !resetToken.IsUsable)
+            {
+                return false;
+            }
+
+            var user = resetToken.User;
+
+            user.PasswordHash =
+                passwordHasher.HashPassword(
+                    user,
+                    request.NewPassword
+                );
+
+            user.UpdatedAt = DateTime.UtcNow;
+
+            resetToken.UsedAt = DateTime.UtcNow;
+
+            // Password changed:
+            // invalidate every active login session.
+            var activeRefreshTokens =
+                await dbContext.RefreshTokens
+                    .Where(token =>
+                        token.UserId == user.Id &&
+                        token.RevokedAt == null)
+                    .ToListAsync(cancellationToken);
+
+            foreach (var refreshToken
+                in activeRefreshTokens)
+            {
+                refreshToken.RevokedAt =
+                    DateTime.UtcNow;
+            }
+
+            await dbContext.SaveChangesAsync(
+                cancellationToken
+            );
+
+            return true;
         }
     }
 }

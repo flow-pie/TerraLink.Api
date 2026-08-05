@@ -66,3 +66,20 @@ Content-Type: application/json
 {
     "refreshToken": "REFRESH_TOKEN"
 }
+
+###
+POST http://localhost:5031/api/auth/forgot-password
+Content-Type: application/json
+
+{
+    "identifier": "amina.wanjiku@example.com"
+}
+
+###
+POST http://localhost:5031/api/auth/reset-password
+Content-Type: application/json
+
+{
+    "token": "TOKEN_FROM_TERMINAL",
+    "newPassword": "NewSecurePassword123!"
+}

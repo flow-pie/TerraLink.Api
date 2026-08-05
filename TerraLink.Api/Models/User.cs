@@ -32,8 +32,8 @@ public class User : IValidatableObject
     //navigation when role==client
     public Client? Client { get; set; }
 
-    public ICollection<RefreshToken> RefreshTokens { get; set; }
-    = new List<RefreshToken>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 
     //NOTE Roles are seeded with fixed IDs, so we can use the RoleId to determine if a user is a loan officer or not.
     private const long LoanOfficerRoleId = 3;

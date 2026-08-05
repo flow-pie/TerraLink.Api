@@ -4,6 +4,12 @@ using TerraLink.Api.Common;
 using TerraLink.Api.DTOs.Auth;
 using TerraLink.Api.Services.Auth;
 
+/// <summary>
+/// read thing that only exist at HTTP level
+/// This file contains handlers whose job is to run validation
+/// call exactly one service method
+/// Map whatever that service returns into a valid HTTP status code
+/// </summary>
 namespace TerraLink.Api.Endpoints
 {
     public static class AuthEndpoints
@@ -23,23 +29,92 @@ namespace TerraLink.Api.Endpoints
             group.MapPost("/logout", LogoutAsync)
                 .RequireAuthorization();
 
+            group.MapPost("/forgot-password", ForgotPasswordAsync)
+                .AllowAnonymous();
+
+            group.MapPost("reset-password", ResetPasswordAsync)
+                .AllowAnonymous();
+
             return endpoints;
+        }
+
+        private static async Task<
+        Results<
+            NoContent,
+            BadRequest<ErrorResponse>
+        >
+        > ResetPasswordAsync(
+            ResetPasswordRequest request,
+            IAuthService authService,
+            CancellationToken cancellationToken)
+        {
+            if (!ValidationHelper.TryValidate(
+                    request,
+                    out var validationErrors))
+            {
+                return TypedResults.BadRequest(
+                    validationErrors.ToErrorResponse()
+                );
+            }
+
+            var resetSucceeded =
+                await authService.ResetPasswordAsync(
+                    request,
+                    cancellationToken
+                );
+
+            if (!resetSucceeded)
+            {
+                return TypedResults.BadRequest(
+                    new ErrorResponse(
+                        "The password reset token is invalid " +
+                        "or has expired.",
+                        new List<string>()
+                    )
+                );
+            }
+
+            return TypedResults.NoContent();
+        }
+
+        private static async Task<
+            Results<
+                Accepted<PasswordResetRequestResponse>,
+                BadRequest<ErrorResponse>
+                >
+            > ForgotPasswordAsync(
+                ForgotPasswordRequest request,
+                IAuthService authService,
+                CancellationToken cancellationToken)
+        {
+            if(!ValidationHelper.TryValidate(request, out var validationErrors))
+                return TypedResults.BadRequest(validationErrors.ToErrorResponse());
+
+            await authService.RequestPasswordResetAsync(request, cancellationToken);
+
+           return TypedResults.Accepted(
+                uri: (string?)null,
+                value: new PasswordResetRequestResponse(
+                    "If an account exists for that identifier, " +
+                    "reset instructions have been sent."
+                )
+            );
         }
 
         //handler functions
 
         private static async Task<
-    Results<
-        NoContent,
-        UnauthorizedHttpResult,
-        BadRequest<ErrorResponse>
-    >
-> LogoutAsync(
-    LogoutRequest request,
-    ClaimsPrincipal user,
-    IAuthService authService,
-    CancellationToken cancellationToken
-)
+            Results<
+                NoContent,
+                UnauthorizedHttpResult,
+                BadRequest<ErrorResponse>
+            >
+        > LogoutAsync(
+            LogoutRequest request,
+            ClaimsPrincipal user,
+            IAuthService authService,
+            CancellationToken cancellationToken
+        )
         {
             if (!ValidationHelper.TryValidate(
                     request,

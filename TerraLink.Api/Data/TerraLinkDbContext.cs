@@ -21,8 +21,9 @@ public class TerraLinkDbContext(DbContextOptions<TerraLinkDbContext> options) : 
     public DbSet<Models.LoanClosure> LoanClosures => Set<Models.LoanClosure>();
     public DbSet<Models.Notification> Notifications => Set<Models.Notification>();
     public DbSet<Models.ReportSchedule> ReportSchedules => Set<Models.ReportSchedule>();
-        public DbSet<Models.AuditLog> AuditLogs => Set<Models.AuditLog>();
+    public DbSet<Models.AuditLog> AuditLogs => Set<Models.AuditLog>();
     public DbSet<Models.RefreshToken> RefreshTokens => Set<Models.RefreshToken>();
+    public DbSet<Models.PasswordResetToken> PasswordResetTokens => Set<Models.PasswordResetToken>();
 
     protected override void OnModelCreating(
      ModelBuilder modelBuilder)
@@ -99,39 +100,74 @@ public class TerraLinkDbContext(DbContextOptions<TerraLinkDbContext> options) : 
                 .HasForeignKey(user => user.RoleId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
-       
+
         modelBuilder.Entity<Models.RefreshToken>(entity =>
-    {
-        entity.ToTable("refresh_tokens");
-
-        entity.HasKey(x => x.Id);
-
-        entity.Property(x => x.TokenHash)
-            .HasMaxLength(128)
-            .IsRequired();
-
-        entity.Property(x => x.ExpiresAt)
-            .IsRequired();
-
-        entity.Property(x => x.CreatedAt)
-            .IsRequired();
-
-        entity.Property(x => x.ReplacedByTokenHash)
-            .HasMaxLength(128);
-
-        entity.HasIndex(x => x.TokenHash)
-            .IsUnique();
-
-        entity.HasIndex(x => new
         {
-            x.UserId,
-            x.ExpiresAt
+            entity.ToTable("refresh_tokens");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.TokenHash)
+                .HasMaxLength(128)
+                .IsRequired();
+
+            entity.Property(x => x.ExpiresAt)
+                .IsRequired();
+
+            entity.Property(x => x.CreatedAt)
+                .IsRequired();
+
+            entity.Property(x => x.ReplacedByTokenHash)
+                .HasMaxLength(128);
+
+            entity.HasIndex(x => x.TokenHash)
+                .IsUnique();
+
+            entity.HasIndex(x => new
+            {
+                x.UserId,
+                x.ExpiresAt
+            });
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.RefreshTokens)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
-        entity.HasOne(x => x.User)
-            .WithMany(x => x.RefreshTokens)
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-    });
+        modelBuilder.Entity<Models.PasswordResetToken>(
+            entity =>
+            {
+                entity.ToTable("password_reset_tokens");
+
+                entity.HasKey(token => token.Id);
+
+                entity.Property(token => token.TokenHash)
+                    .HasMaxLength(128)
+                    .IsRequired();
+
+                entity.Property(token => token.ExpiresAt)
+                    .IsRequired();
+
+                entity.Property(token => token.CreatedAt)
+                    .IsRequired();
+
+                entity.HasIndex(token => token.TokenHash)
+                    .IsUnique();
+
+                entity.HasIndex(token => new
+                {
+                    token.UserId,
+                    token.ExpiresAt
+                });
+
+                entity.HasOne(token => token.User)
+                    .WithMany(user =>
+                        user.PasswordResetTokens)
+                    .HasForeignKey(token =>
+                        token.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            }
+        );
     }
 }
