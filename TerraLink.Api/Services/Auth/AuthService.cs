@@ -48,6 +48,19 @@ namespace TerraLink.Api.Services.Auth
                     LoginStatus.AccountInactive
                 ); // user is not active
 
+            if (user.MfaEnabled)
+            {
+                var mfaToken = jwtService.GenerateMfaToken(user);
+
+                return new LoginResult(
+                    Status: LoginStatus.MfaRequired,
+                    MfaResponse: new MfaChallengeResponse(
+                        MfaRequired: true,
+                        MfaToken: mfaToken
+                    )
+                );
+            }
+
             var accessToken =
             jwtService.GenerateAccessToken(user);
 
@@ -300,6 +313,101 @@ namespace TerraLink.Api.Services.Auth
             );
 
             return true;
+        }
+
+        public async Task<LoginResponse?> VerifyMfaAsync(
+            MfaVerifyRequest request,
+            CancellationToken cancellationToken
+        )
+        {
+            var userId =
+                jwtService.ValidateMfaToken(
+                    request.MfaToken
+                );
+
+            if (userId is null)
+            {
+                return null;
+            }
+
+            var user = await dbContext.Users
+                .Include(user => user.Role)
+                .SingleOrDefaultAsync(
+                    user =>
+                        user.Id == userId.Value,
+                    cancellationToken
+                );
+
+            if (user is null ||
+                user.Status != UserStatus.ACTIVE ||
+                !user.MfaEnabled ||
+                string.IsNullOrWhiteSpace(
+                    user.MfaSecret))
+            {
+                return null;
+            }
+
+            var secretBytes =
+                OtpNet.Base32Encoding
+                    .ToBytes(user.MfaSecret);
+
+            var totp =
+                new OtpNet.Totp(
+                    secretBytes
+                );
+
+            var isValid =
+                totp.VerifyTotp(
+                    request.Code,
+                    out _,
+                    new OtpNet.VerificationWindow(
+                        previous: 1,
+                        future: 1
+                    )
+                );
+
+            if (!isValid)
+            {
+                return null;
+            }
+
+            var accessToken =
+                jwtService.GenerateAccessToken(
+                    user
+                );
+
+            var refreshToken =
+                jwtService.GenerateRefreshToken();
+
+            dbContext.RefreshTokens.Add(
+                new RefreshToken
+                {
+                    UserId = user.Id,
+                    TokenHash =
+                        jwtService.HashToken(
+                            refreshToken
+                        ),
+                    ExpiresAt =
+                        jwtService
+                            .GetRefreshTokenExpiry()
+                }
+            );
+
+            user.LastLogin = DateTime.UtcNow;
+
+            await dbContext.SaveChangesAsync(
+                cancellationToken
+            );
+
+            return new LoginResponse(
+                AccessToken: accessToken,
+                RefreshToken: refreshToken,
+                ExpiresIn: 3600,
+                User: new LoginUserResponse(
+                    Id: user.Id,
+                    RoleName: user.Role.Name
+                )
+            );
         }
     }
 }

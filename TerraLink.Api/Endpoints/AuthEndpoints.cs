@@ -35,7 +35,50 @@ namespace TerraLink.Api.Endpoints
             group.MapPost("reset-password", ResetPasswordAsync)
                 .AllowAnonymous();
 
+            group.MapPost("mfa/verify", VerifyMfaAsync)
+                .AllowAnonymous();
+
             return endpoints;
+        }
+
+        private static async Task<
+            Results<
+                Ok<LoginResponse>,
+                BadRequest<ErrorResponse>,
+                StatusCodeHttpResult
+            >
+        > VerifyMfaAsync(
+            MfaVerifyRequest request,
+            IAuthService authService,
+            CancellationToken cancellationToken
+        )
+        {
+            if (!ValidationHelper.TryValidate(
+                    request,
+                    out var validationErrors))
+            {
+                return TypedResults.BadRequest(
+                    validationErrors.ToErrorResponse()
+                );
+            }
+
+            var response =
+                await authService.VerifyMfaAsync(
+                    request,
+                    cancellationToken
+                );
+
+            if (response is null)
+            {
+                return TypedResults.BadRequest(
+                    new ErrorResponse(
+                        "The MFA code or MFA token is invalid.",
+                        new List<string>()
+                    )
+                );
+            }
+
+            return TypedResults.Ok(response);
         }
 
         private static async Task<
@@ -87,18 +130,18 @@ namespace TerraLink.Api.Endpoints
                 IAuthService authService,
                 CancellationToken cancellationToken)
         {
-            if(!ValidationHelper.TryValidate(request, out var validationErrors))
+            if (!ValidationHelper.TryValidate(request, out var validationErrors))
                 return TypedResults.BadRequest(validationErrors.ToErrorResponse());
 
             await authService.RequestPasswordResetAsync(request, cancellationToken);
 
-           return TypedResults.Accepted(
-                uri: (string?)null,
-                value: new PasswordResetRequestResponse(
-                    "If an account exists for that identifier, " +
-                    "reset instructions have been sent."
-                )
-            );
+            return TypedResults.Accepted(
+                 uri: (string?)null,
+                 value: new PasswordResetRequestResponse(
+                     "If an account exists for that identifier, " +
+                     "reset instructions have been sent."
+                 )
+             );
         }
 
         //handler functions
@@ -183,6 +226,7 @@ namespace TerraLink.Api.Endpoints
         public static async Task<
             Results<
                 Ok<LoginResponse>,
+                Ok<MfaChallengeResponse>,
                 UnauthorizedHttpResult,
                 ForbidHttpResult,
                 BadRequest<ErrorResponse>
@@ -220,7 +264,7 @@ namespace TerraLink.Api.Endpoints
                     => TypedResults.Forbid(),
 
                 LoginStatus.MfaRequired
-                    => TypedResults.Forbid(),
+                    => TypedResults.Ok(result.MfaResponse!),
 
                 _ => TypedResults.Unauthorized()
             };

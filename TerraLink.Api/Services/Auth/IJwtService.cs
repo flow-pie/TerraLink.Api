@@ -8,5 +8,7 @@ namespace TerraLink.Api.Services.Auth
         string GenerateRefreshToken();
         string HashToken(string token);
         DateTime GetRefreshTokenExpiry();
+        string GenerateMfaToken(User user);
+        long? ValidateMfaToken(string token);
     }
 }

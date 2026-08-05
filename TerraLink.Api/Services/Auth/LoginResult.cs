@@ -15,6 +15,7 @@ namespace TerraLink.Api.Services.Auth
     public record LoginResult
     (
         LoginStatus Status, 
-        LoginResponse? Response = null
+        LoginResponse? Response = null,
+        MfaChallengeResponse? MfaResponse = null
     );
 }

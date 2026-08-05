@@ -83,3 +83,12 @@ Content-Type: application/json
     "token": "TOKEN_FROM_TERMINAL",
     "newPassword": "NewSecurePassword123!"
 }
+
+###
+POST http://localhost:5031/api/auth/mfa/verify
+Content-Type: application/json
+
+{
+    "mfaToken": "MFA_TOKEN_FROM_LOGIN",
+    "code": "123456"
+}

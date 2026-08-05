@@ -40,6 +40,45 @@ namespace TerraLink.Api.Services.Auth
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public string GenerateMfaToken(User user)
+        {
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    _options.SecretKey
+                    ?? throw new InvalidOperationException(
+                        "JWT key is missing."
+                    )
+                )
+            );
+
+            var credentials = new SigningCredentials(
+                key,
+                SecurityAlgorithms.HmacSha256
+            );
+
+            var claims = new[]
+            {
+                new Claim(
+                    ClaimTypes.NameIdentifier,
+                    user.Id.ToString()
+                ),
+                new Claim(
+                    "token_type",
+                    "mfa"
+                )
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: _options.Issuer,
+                audience: _options.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(5),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
         public string GenerateRefreshToken()
         {
             var randomBytes = RandomNumberGenerator.GetBytes(64); // 64 bytes = 512 bits
@@ -58,6 +97,72 @@ namespace TerraLink.Api.Services.Auth
             var hash = SHA256.HashData(tokenBytes);
 
             return Convert.ToHexString(hash);
+        }
+
+        public long? ValidateMfaToken(string token)
+        {
+            try
+            {
+                var principal =
+                    new JwtSecurityTokenHandler()
+                        .ValidateToken(
+                            token,
+                            new TokenValidationParameters
+                            {
+                                ValidateIssuer = true,
+                                ValidIssuer =
+                                    _options.Issuer,
+
+                                ValidateAudience = true,
+                                ValidAudience =
+                                    _options.Audience,
+
+                                ValidateLifetime = true,
+
+                                ValidateIssuerSigningKey = true,
+
+                                IssuerSigningKey =
+                                    new SymmetricSecurityKey(
+                                        Encoding.UTF8.GetBytes(
+                                            _options.SecretKey
+                                            ?? throw new InvalidOperationException(
+                                                "JWT key is missing."
+                                            )
+                                        )
+                                    ),
+
+                                ClockSkew =
+                                    TimeSpan.Zero
+                            },
+                            out _
+                        );
+
+                var tokenType =
+                    principal.FindFirst(
+                        "token_type"
+                    )?.Value;
+
+                if (tokenType != "mfa")
+                {
+                    return null;
+                }
+
+                var userId =
+                    principal.FindFirst(
+                        ClaimTypes.NameIdentifier
+                    )?.Value;
+
+                return long.TryParse(
+                    userId,
+                    out var id
+                )
+                    ? id
+                    : null;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
