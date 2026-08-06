@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TerraLink.Api.Services.Auth;
+using TerraLink.Api.Services.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +34,7 @@ builder.Services.Configure<JwtOptions>(
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
-var jwtKey = jwtSection["Key"] ?? throw new InvalidOperationException("JWT Key not found in configuration.");
+var jwtKey = jwtSection["SecretKey"] ?? throw new InvalidOperationException("JWT Key not found in configuration.");
 var jwtIssuer = jwtSection["Issuer"] ?? throw new InvalidOperationException("JWT Issuer not found in configuration.");
 var jwtAudience = jwtSection["Audience"] ?? throw new InvalidOperationException("JWT Audience not found in configuration.");
 
@@ -58,6 +59,7 @@ builder.Services
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IClientService, ClientService>();
 
 builder.Services.AddAuthorization();
 
@@ -78,6 +80,7 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapUserEndpoints();
+app.MapClientEndpoints();
 
 //perform database migration on startup
 app.DbMigrate();

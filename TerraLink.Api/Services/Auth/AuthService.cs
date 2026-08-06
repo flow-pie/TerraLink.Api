@@ -8,7 +8,6 @@ namespace TerraLink.Api.Services.Auth
 {
     public class AuthService(
         TerraLinkDbContext dbContext,
-        IPasswordHasher<User> passwordHasher,
         IJwtService jwtService
     ) : IAuthService
     {
@@ -18,12 +17,16 @@ namespace TerraLink.Api.Services.Auth
 
             var user = await dbContext.Users
                 .Include(u => u.Role)
-                .SingleOrDefaultAsync(
-                    user => user.Username == identifier
-                        || user.Email == identifier
-                        || user.EmployeeNo == identifier,
-                    cancellationToken
-                );
+                .SingleOrDefaultAsync(u =>
+                    (u.Username != null &&
+                     u.Username.ToLower() == identifier) ||
+
+                    (u.Email != null &&
+                     u.Email.ToLower() == identifier) ||
+
+                    (u.EmployeeNo != null &&
+                     u.EmployeeNo.ToLower() == identifier),
+                    cancellationToken);
 
             if (user is null)
                 return new LoginResult(
@@ -31,14 +34,13 @@ namespace TerraLink.Api.Services.Auth
                 );
 
 
-            var passwordResult =
-                    passwordHasher.VerifyHashedPassword(
-                        user,
-                        user.PasswordHash,
-                        request.Password
-            );
+            var isValid =
+                BCrypt.Net.BCrypt.Verify(
+                    request.Password,
+                    user.PasswordHash
+                );
 
-            if (passwordResult == PasswordVerificationResult.Failed)
+            if (!isValid)
                 return new LoginResult(
                     LoginStatus.InvalidCredentials
                 ); // password does not match
@@ -283,8 +285,7 @@ namespace TerraLink.Api.Services.Auth
             var user = resetToken.User;
 
             user.PasswordHash =
-                passwordHasher.HashPassword(
-                    user,
+                BCrypt.Net.BCrypt.HashPassword(
                     request.NewPassword
                 );
 
