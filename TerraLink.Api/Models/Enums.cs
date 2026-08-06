@@ -158,4 +158,11 @@ namespace TerraLink.Api.Models
         MONTHLY
     }
 
+    public enum StorageFolder
+    {
+        Kyc,
+        ProfilePhotos,
+        Reports
+    }
+
 }

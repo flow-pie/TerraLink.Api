@@ -1,13 +1,89 @@
-GET http://localhost:5031
+@baseUrl = http://localhost:5031
+@boundary = TerraLinkBoundary
 
-###
-GET http://localhost:5031/users
 
-###
-GET http://localhost:5031/users/2
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDcxOTE0NDMwNyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6IjlkOGZiNmZmLTg2NmEtNGUxYy1iZWVmLWVlZWEwYWVkYWZlNyIsImV4cCI6MTc4NjAxMzgwMiwiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.sgd79dPO6HdYljlN7Flj5n2RstiRNfuvzAFxs9v2C4M
+@refreshToken = KjSa+1YcRaqUTD+TR9AnqQTlkpzKPyVpj+5x76co4i6N9TbBdT28FNiTw49t6Wq8rdeVJJcT0vIHt99m6/JM6w==
+@mfaTokenFromLogin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJ0b2tlbl90eXBlIjoibWZhIiwiZXhwIjoxNzg2MDEwNDA1LCJpc3MiOiJUZXJyYUxpbmsuQXBpIiwiYXVkIjoiVGVycmFMaW5rLkNsaWVudCJ9.0g1wSlhjM5ghWE5_nTLc3s-GiRIEGZr3gs8WZXSHtLQ
+@loanOfficerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDcxOTE0NDMwNyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6IjlkOGZiNmZmLTg2NmEtNGUxYy1iZWVmLWVlZWEwYWVkYWZlNyIsImV4cCI6MTc4NjAxMzgwMiwiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.sgd79dPO6HdYljlN7Flj5n2RstiRNfuvzAFxs9v2C4M
 
-###
-POST http://localhost:5031/users
+###############################################################################
+# HEALTH                                                                      #
+###############################################################################
+
+### Root / health check
+GET {{baseUrl}}
+
+
+###############################################################################
+# AUTH                                                                                 
+###############################################################################
+
+### Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+    "identifier": "TL-8842",
+    "password": "Admin@terralink26"
+}
+
+### Refresh token
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "{{refreshToken}}"
+}
+
+### Logout
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "refreshToken": "{{refreshToken}}"
+}
+
+### Forgot password
+POST {{baseUrl}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+    "identifier": "loan.officer@terralink.com"
+}
+
+### Reset password
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+    "token": "TOKEN_FROM_TERMINAL",
+    "newPassword": "NewSecurePassword123!"
+}
+
+### Verify MFA
+POST {{baseUrl}}/api/auth/mfa/verify
+Content-Type: application/json
+
+{
+    "mfaToken": "{{mfaTokenFromLogin}}",
+    "code": "515588"
+}
+
+
+###############################################################################
+# USERS  (staff: admins, loan officers, etc.)
+###############################################################################
+
+### List all users
+GET {{baseUrl}}/users
+
+### Get user by id
+GET {{baseUrl}}/users/2
+
+### Create user
+POST {{baseUrl}}/users
 Content-Type: application/json
 
 {
@@ -19,8 +95,8 @@ Content-Type: application/json
     "Status": "Active"
 }
 
-###
-PUT http://localhost:5031/users/2
+### Update user
+PUT {{baseUrl}}/users/2
 Content-Type: application/json
 
 {
@@ -29,66 +105,115 @@ Content-Type: application/json
     "Email": "alice.smith@example.com",
     "Phone": "987-654-3210",
     "Password": "newpassword456",
-
     "Role": "Admin",
     "Status": "Active"
 }
 
-###
-DELETE http://localhost:5031/users/2
+### Delete user
+DELETE {{baseUrl}}/users/2
 
 
-###
-#AUTH ENDPOINTS
-POST http://localhost:5031/api/auth/login
-Content-Type: application/json
+###############################################################################
+# CLIENTS
+###############################################################################
 
-{
-    "identifier": "ML-8842",
-    "password": "P@ssw0rd123"
-}
+### Officer registers and auto-verifies a client
+POST {{baseUrl}}/api/clients/register
+Authorization: Bearer {{loanOfficerToken}}
+Content-Type: multipart/form-data; boundary={{boundary}}
 
-###
-//refresh endpoint
-POST http://localhost:5031/api/auth/refresh
-Content-Type: application/json
+--{{boundary}}
+Content-Disposition: form-data; name="fullName"
 
-{
-    "refreshToken": "TOKEN_FROM_LOGIN"
-}
+John Mwangi
+--{{boundary}}
+Content-Disposition: form-data; name="nationalId"
 
-###
-#logout
-POST http://localhost:5031/api/auth/logout
-Authorization: Bearer ACCESS_TOKEN_
-Content-Type: application/json
+87654321
+--{{boundary}}
+Content-Disposition: form-data; name="phone"
 
-{
-    "refreshToken": "REFRESH_TOKEN"
-}
+0798765432
+--{{boundary}}
+Content-Disposition: form-data; name="dateOfBirth"
 
-###
-POST http://localhost:5031/api/auth/forgot-password
-Content-Type: application/json
+1990-02-15
+--{{boundary}}
+Content-Disposition: form-data; name="gender"
 
-{
-    "identifier": "amina.wanjiku@example.com"
-}
+MALE
+--{{boundary}}
+Content-Disposition: form-data; name="address"
 
-###
-POST http://localhost:5031/api/auth/reset-password
-Content-Type: application/json
+Karen, Nairobi
+--{{boundary}}
+Content-Disposition: form-data; name="nationalIdFront"; filename="id-front.jpg"
+Content-Type: image/jpeg
 
-{
-    "token": "TOKEN_FROM_TERMINAL",
-    "newPassword": "NewSecurePassword123!"
-}
+< ./test-files/id-front.jpg
+--{{boundary}}
+Content-Disposition: form-data; name="nationalIdBack"; filename="id-back.jpg"
+Content-Type: image/jpeg
 
-###
-POST http://localhost:5031/api/auth/mfa/verify
-Content-Type: application/json
+< ./test-files/id-back.jpg
+--{{boundary}}
+Content-Disposition: form-data; name="passportPhoto"; filename="passport-photo.jpg"
+Content-Type: image/jpeg
 
-{
-    "mfaToken": "MFA_TOKEN_FROM_LOGIN",
-    "code": "123456"
-}
+< ./test-files/passport-photo.jpg
+--{{boundary}}--
+
+
+
+### Client (SELF REGISTRATION)
+POST {{baseUrl}}/api/clients/register
+Content-Type: multipart/form-data; boundary={{boundary}}
+
+--{{boundary}}
+Content-Disposition: form-data; name="fullName"
+
+Amina Wanjiku
+--{{boundary}}
+Content-Disposition: form-data; name="nationalId"
+
+12345678
+--{{boundary}}
+Content-Disposition: form-data; name="phone"
+
+0712345678
+--{{boundary}}
+Content-Disposition: form-data; name="dateOfBirth"
+
+1998-05-12
+--{{boundary}}
+Content-Disposition: form-data; name="gender"
+
+FEMALE
+--{{boundary}}
+Content-Disposition: form-data; name="address"
+
+Nairobi, Kenya
+--{{boundary}}
+Content-Disposition: form-data; name="email"
+
+amina@example.com
+--{{boundary}}
+Content-Disposition: form-data; name="password"
+
+StrongPassword123!
+--{{boundary}}
+Content-Disposition: form-data; name="nationalIdFront"; filename="id-front.jpg"
+Content-Type: image/jpeg
+
+< ./test-files/id-front.jpg
+--{{boundary}}
+Content-Disposition: form-data; name="nationalIdBack"; filename="id-back.jpg"
+Content-Type: image/jpeg
+
+< ./test-files/id-back.jpg
+--{{boundary}}
+Content-Disposition: form-data; name="passportPhoto"; filename="passport-photo.jpg"
+Content-Type: image/jpeg
+
+< ./test-files/passport-photo.jpg
+--{{boundary}}--
