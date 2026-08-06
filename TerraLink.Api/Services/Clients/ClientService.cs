@@ -145,7 +145,9 @@ public class ClientService(
                     cancellationToken);
 
 
-            
+            User? clientUser = null;
+
+            var clientNo = GenerateClientNumber();
 
             var clientRole =
                     await dbContext.Roles
@@ -155,28 +157,28 @@ public class ClientService(
                             cancellationToken
                         );
 
-                if (clientRole is null)
-                    throw new InvalidOperationException(
-                        "Client role is missing. " +
-                        "Seed the roles table."
-                    );
+            if (clientRole is null)
+                throw new InvalidOperationException(
+                    "Client role is missing. " +
+                    "Seed the roles table."
+                );
 
+            clientUser = new User
+            {
+                EmployeeNo = clientNo,
+                Username = phone,
+                Email = email,
+                RoleId = clientRole.Id,
+                Status = isOfficerRegistration
+                    ? UserStatus.INACTIVE
+                    : UserStatus.ACTIVE,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(
+                    request.Password ?? "Terralink@2026")
+            };
 
-                var clientUser = new User
-                {
-                    Username = phone,
-                    Email = email,
-                    RoleId = clientRole.Id,
-                    Status = isOfficerRegistration
-                        ? UserStatus.INACTIVE
-                        : UserStatus.ACTIVE,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(
-                        request.Password ?? "Terralink@2026")
-                };
+            dbContext.Users.Add(clientUser);
 
-                dbContext.Users.Add(clientUser);
-
-                await dbContext.SaveChangesAsync(cancellationToken);
+            await dbContext.SaveChangesAsync(cancellationToken);
 
             var now = DateTime.UtcNow;
 
@@ -184,7 +186,7 @@ public class ClientService(
                 new Client
                 {
                     ClientNo =
-                        GenerateClientNumber(),
+                        clientNo,
 
                     UserId =
                         clientUser?.Id,
