@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using TerraLink.Api.Common;
 using TerraLink.Api.DTOs.Clients;
 using TerraLink.Api.Services.Clients;
@@ -12,18 +13,40 @@ public static class ClientEndpoints
         MapClientEndpoints(
             this IEndpointRouteBuilder app)
     {
-        var group =
-            app.MapGroup("/api/clients")
-                .WithTags("Clients").DisableAntiforgery();
-
+        var group = app.MapGroup("/api/clients")
+            .WithTags("Clients").DisableAntiforgery();
+        
+        //GET /api/clients/register
         group.MapPost(
             "/register",
             RegisterAsync
         )
         .AllowAnonymous();
 
-        return app;
+        //GET /api/users?page=&pageSize=
+        group.MapGet("/", GetAllClientsAsync)
+            .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));//only loan officers can call this endpoint
+
+
+        return group;
     }
+
+    private static async Task<IResult> GetAllClientsAsync(
+        int page,
+        int pageSize,
+        IClientService clientService,
+        CancellationToken cancellationToken
+    )
+    {
+        var clients = await clientService.GetAllClientsAsync(
+            page,
+            pageSize,
+            cancellationToken
+        );
+
+        return Results.Ok(clients);
+    }
+
 
     private static async Task<IResult>
         RegisterAsync(

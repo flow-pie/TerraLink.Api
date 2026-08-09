@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TerraLink.Api.Data;
+using TerraLink.Api.DTOs;
 using TerraLink.Api.DTOs.Clients;
 using TerraLink.Api.Models;
 
@@ -30,8 +31,8 @@ public class ClientService(
 
         var existingNationalId =
             await dbContext.Clients.AnyAsync(
-                client =>
-                    client.NationalId == nationalId,
+                user =>
+                    user.NationalId == nationalId,
                 cancellationToken
             );
 
@@ -44,8 +45,8 @@ public class ClientService(
 
         var existingPhone =
             await dbContext.Clients.AnyAsync(
-                client =>
-                    client.Phone == phone,
+                user =>
+                    user.Phone == phone,
                 cancellationToken
             );
 
@@ -182,7 +183,7 @@ public class ClientService(
 
             var now = DateTime.UtcNow;
 
-            var client =
+            var    user =
                 new Client
                 {
                     ClientNo =
@@ -241,7 +242,7 @@ public class ClientService(
                 };
 
             dbContext.Clients.Add(
-                client
+                user
             );
 
             await dbContext.SaveChangesAsync(
@@ -252,7 +253,7 @@ public class ClientService(
             {
                 new()
                 {
-                    ClientId = client.Id,
+                    ClientId =     user.Id,
                     DocType = KycDocType.ID_FRONT,
                     FileUrl = nationalIdFront,
                     Verified = isOfficerRegistration,
@@ -264,7 +265,7 @@ public class ClientService(
 
                 new()
                 {
-                    ClientId = client.Id,
+                    ClientId =     user.Id,
                     DocType = KycDocType.ID_BACK,
                     FileUrl = nationalIdBack,
                     Verified = isOfficerRegistration,
@@ -276,7 +277,7 @@ public class ClientService(
 
                 new()
                 {
-                    ClientId = client.Id,
+                    ClientId =     user.Id,
                     DocType = KycDocType.PASSPORT_PHOTO,
                     FileUrl = passport,
                     Verified = isOfficerRegistration,
@@ -300,15 +301,15 @@ public class ClientService(
             return new ClientRegistrationResult(
                 ClientRegistrationStatus.Success,
                 new RegisterClientResponse(
-                    ClientId: client.Id,
+                    ClientId:      user.Id,
                     UserId: clientUser?.Id,
                     ClientNo:
-                        client.ClientNo!,
+                        user.ClientNo!,
                     RegistrationChannel:
-                        client.RegistrationChannel
+                        user.RegistrationChannel
                             .ToString(),
                     VerificationStatus:
-                        client.VerificationStatus
+                        user.VerificationStatus
                             .ToString(),
                     Message:
                         isOfficerRegistration
@@ -350,5 +351,37 @@ public class ClientService(
             $"TC-{Guid.NewGuid()
                 .ToString("N")[..4]
                 .ToUpperInvariant()}";
+    }
+
+    public async Task<PagedResponse<ClientsListItemResponse>> GetAllClientsAsync(int page, int pageSize, CancellationToken cancellationToken)
+    {
+        //query
+        var query = dbContext.Users.Where(u => u.Role.Name == "client");
+
+        //total count 
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        //clients
+        var clients = await query
+            .OrderBy(u => u.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select( user => new ClientsListItemResponse(
+                user.Id,
+                user.Username,
+                user.Email,
+                user.EmployeeNo,
+                user.Role.Name,
+                user.Status.ToString(),
+                user.LastLogin
+            )).ToListAsync(cancellationToken);
+
+        //build the response
+        return new PagedResponse<ClientsListItemResponse>(
+            Items: clients,
+            Page: page,
+            PageSize: pageSize,
+            TotalCount: totalCount
+        );
     }
 }

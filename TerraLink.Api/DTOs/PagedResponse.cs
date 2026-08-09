@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
-namespace TerraLink.Api.DTOs.Users;
+namespace TerraLink.Api.DTOs;
 public record PagedResponse<T>
 (
     IReadOnlyList<T> Items,

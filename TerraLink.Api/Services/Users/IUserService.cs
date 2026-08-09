@@ -12,10 +12,4 @@ public interface IUserService
         CancellationToken cancellationToken
     );
 
-    Task<PagedResponse<OfficerListItem>> 
-    GetLoanOfficersAsync(
-        int page,
-        int pageSize,
-        CancellationToken cancellationToken
-    );
 }

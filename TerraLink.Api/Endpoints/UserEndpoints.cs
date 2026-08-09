@@ -30,12 +30,6 @@ namespace TerraLink.Api.Endpoints
             group.MapPatch("/me", UpdateMeAsync)
                 .RequireAuthorization();
 
-
-            //GET /api/users?groupId=&page=&pageSize=
-            group.MapGet("/", GetUsers);
-            //.RequireAuthorization(policy => policy.RequireRole(LoanOfficerRole)); TODO: Uncomment this line to require authorization for this endpoint.
-
-
             //GET /api/users/{id}
             group.MapGet("/{id:long}", GetUserById)
             .WithName(GetUserByIdEndpointName);

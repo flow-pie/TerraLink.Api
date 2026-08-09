@@ -7,11 +7,6 @@ public class UserService(
     TerraLinkDbContext dbContext
 ) : IUserService
 {
-    public Task<PagedResponse<OfficerListItem>> GetLoanOfficersAsync(int page, int pageSize, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task<UserProfileResponse?> GetMeAsync(long userId, CancellationToken cancellationToken)
     {
         var user = await dbContext.Users

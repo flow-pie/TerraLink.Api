@@ -32,6 +32,7 @@ builder.Services.Configure<JwtOptions>(
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+//The values are needed by bearer auth to validate icoming token.
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection["SecretKey"] ?? throw new InvalidOperationException("JWT Key not found in configuration.");
 var jwtIssuer = jwtSection["Issuer"] ?? throw new InvalidOperationException("JWT Issuer not found in configuration.");
