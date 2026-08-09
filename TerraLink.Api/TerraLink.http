@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:5031
 @boundary = TerraLinkBoundary
 
-@accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDcxOTE0NDMwNyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6ImIyZDA3YjNjLThkMzUtNGVhMy05ODFmLTA1ZDlmODUwNjg2OSIsImV4cCI6MTc4NjAyMDU3MywiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.fdzxs2RHu0cvzsmh0MG8Lp588vNyevI-bJ9CFh9gosY
+@accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDcxOTE0NDMwNyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6ImRmN2ZhM2YzLTI4OTMtNDU2Yi05ZmVmLWNiYzQ0ZDRjYmY4MSIsImV4cCI6MTc4NjI2ODAwMCwiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.PocNMhqMhruBF7NhITCFmH-R7bLrS6nf6fvSFPfOp6Q
 @refreshToken = KjSa+1YcRaqUTD+TR9AnqQTlkpzKPyVpj+5x76co4i6N9TbBdT28FNiTw49t6Wq8rdeVJJcT0vIHt99m6/JM6w==
 @mfaTokenFromLogin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJ0b2tlbl90eXBlIjoibWZhIiwiZXhwIjoxNzg2MDE0NTYyLCJpc3MiOiJUZXJyYUxpbmsuQXBpIiwiYXVkIjoiVGVycmFMaW5rLkNsaWVudCJ9.-RDF-75FQrAk7iM6obGVfflrBmIYIYEBBO0zvtOKNZM
 @loanOfficerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDcxOTE0NDMwNyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6Ijg2ZDRkODAzLWE1MmMtNDg1OS1hMWQwLWQxZDUxNjg0ZTJkMSIsImV4cCI6MTc4NjAxNzk5MywiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.xBIOKRHjCw2SBRHykNd_Cda0PcXyx5L-npE-mX56h7Q
@@ -75,11 +75,26 @@ Content-Type: application/json
 # USERS  (staff: admins, loan officers, etc.)
 ###############################################################################
 
+### GET logged in user profile
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+
 ### List all users
-GET {{baseUrl}}/users
+GET {{baseUrl}}/api/users
 
 ### Get user by id
 GET {{baseUrl}}/users/2
+
+### patch logged in user
+PATCH  {{baseUrl}}/api/users/me
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+    "email": "loan.officer@terralink.org",
+    "username": "0798765431",
+    "mfaEnabled": false
+}
 
 ### Create user
 POST {{baseUrl}}/users

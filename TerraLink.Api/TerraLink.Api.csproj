@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
+    <UserSecretsId>b5191787-b300-487f-b8d6-50b924740f5f</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using TerraLink.Api.Common;
 using TerraLink.Api.Data;
-using TerraLink.Api.DTOs;
+using TerraLink.Api.DTOs.Users;
 using TerraLink.Api.Models;
 
 namespace TerraLink.Api.Endpoints
@@ -17,16 +17,18 @@ namespace TerraLink.Api.Endpoints
         {
             var group = app.MapGroup("/api/users")
             .WithTags("Users");
-            //.RequireAuthorization(); TODO: Uncomment this line to require authorization for all user endpoints.
+            //.RequireAuthorization();// TODO: Uncomment this line to require authorization for all user endpoints.
 
             //GET /
             app.MapGet("/", () => "Hello World!");
 
             //GET /api/users/me
-            group.MapGet("/me", GetMe);
+            group.MapGet("/me", GetMeAsync)
+                .RequireAuthorization();
 
             //PATCH /api/users/me
-            group.MapPatch("/me", UpdateMe);
+            group.MapPatch("/me", UpdateMeAsync)
+                .RequireAuthorization();
 
 
             //GET /api/users?groupId=&page=&pageSize=
@@ -47,9 +49,26 @@ namespace TerraLink.Api.Endpoints
             return group;
         }
 
-        private static async Task GetMe(HttpContext context)
-        {
-            throw new NotImplementedException();
+        private static async Task<IResult> 
+        GetMeAsync(
+            ClaimsPrincipal user,
+            IUserService userService,
+            CancellationToken cancellationToken
+            )
+        {      
+            //get user id using an extension method
+            var userId = user.GetUserId(); 
+            
+            //call the service
+            var profile = await userService.GetMeAsync(
+                userId,
+                cancellationToken
+            );
+
+            if(profile is null)
+                return Results.NotFound();
+
+            return Results.Ok(profile);
         }
 
         private static async Task GetUsers(HttpContext context)
@@ -110,70 +129,38 @@ namespace TerraLink.Api.Endpoints
             return long.Parse(claim);
         }
 
-        private static UserResponseDto ToResponseDto(User u) => new()
-        {
-             Id = u.Id,
-            Username = u.Username,
-            Email = u.Email,
-            EmployeeNo = u.EmployeeNo,
-            RoleName = u.Role.Name,
-            //BranchId = u.BranchId,
-            //BranchName = u.Branch?.Name,
-            Status = u.Status.ToString(),
-            MfaEnabled = u.MfaEnabled,
-            LastLogin = u.LastLogin,
-            CreatedAt = u.CreatedAt,
-        };
+        private static UserProfileResponse ToResponseDto(User u) => new UserProfileResponse
+        (
+            Id : u.Id,
+            Username : u.Username,
+            Email : u.Email,
+            EmployeeNo : u.EmployeeNo,
+            RoleName : u.Role.Name,
+            Status : u.Status,
+            MfaEnabled : u.MfaEnabled,
+            LastLogin : u.LastLogin,
+            CreatedAt : u.CreatedAt
+        );
 
-            // ---------------------------------------------------------------
+        // ---------------------------------------------------------------
         // PATCH /api/users/me
         // ---------------------------------------------------------------
-        private static async Task<Results<Ok<UserResponseDto>, NotFound, Conflict<ErrorResponse>, ValidationProblem>> UpdateMe(
-            UpdateMeRequestDto dto,
-            ClaimsPrincipal principal,
-            TerraLinkDbContext db)
+        private static async Task<IResult> UpdateMeAsync(
+                UpdateProfileRequest request,
+                ClaimsPrincipal principal,                                                                                                                                                                                                                                                                                                                                                                                                                             
+                IUserService userService,
+                CancellationToken cancellationToken
+                )
         {
-            if (!ValidationHelper.TryValidate(dto, out var errors))
-                return TypedResults.ValidationProblem(errors.ToDictionary(
-                    e => e.MemberNames.FirstOrDefault() ?? string.Empty,
-                    e => new[] { e.ErrorMessage ?? "Invalid value." }));
- 
-            var id = GetCurrentUserId(principal);
- 
-            var user = await db.Users
-                .Include(u => u.Role)
-                //.Include(u => u.Branch)
-                .FirstOrDefaultAsync(u => u.Id == id);
- 
-            if (user is null) return TypedResults.NotFound();
- 
-            if (dto.Username is not null)
-            {
-                var taken = await db.Users.AnyAsync(u => u.Id != user.Id && u.Username == dto.Username);
-                if (taken) return TypedResults.Conflict(new ErrorResponse("That username is already in use.", new List<string> { "username" }));
-                user.Username = dto.Username;
-            }
- 
-            if (dto.Email is not null)
-            {
-                var taken = await db.Users.AnyAsync(u => u.Id != user.Id && u.Email == dto.Email);
-                if (taken) return TypedResults.Conflict(new ErrorResponse("That email is already in use.",new List<string> { "email" }));
-                user.Email = dto.Email;
-            }
- 
-            // Only flips the flag — provisioning mfa_secret is a separate
-            // /api/auth/mfa/setup step, deliberately not touched here.
-            if (dto.MfaEnabled is not null)
-            {
-                if (dto.MfaEnabled == true && string.IsNullOrEmpty(user.MfaSecret))
-                    return TypedResults.Conflict(new ErrorResponse("Complete MFA setup before enabling it.",new List<string> { "mfa_secret" }));
-                user.MfaEnabled = dto.MfaEnabled.Value;
-            }
- 
-            user.UpdatedAt = DateTime.UtcNow;
-            await db.SaveChangesAsync();
- 
-            return TypedResults.Ok(ToResponseDto(user));
+            var userId = principal.GetUserId();
+
+            var profile = await userService.UpdateMeAsync(userId,request,cancellationToken);
+
+            if(profile is null)
+                return Results.NotFound(); 
+
+            return Results.Ok(profile);
+            
         }
 
     }
