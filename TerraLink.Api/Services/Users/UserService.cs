@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TerraLink.Api.Common;
 using TerraLink.Api.Data;
 using TerraLink.Api.DTOs.Users;
 
@@ -66,7 +67,7 @@ public class UserService(
                     cancellationToken
                 );
             if(emailExists)
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "Email is already in use"
                 );
         }
@@ -87,14 +88,14 @@ public class UserService(
                 );
 
             if(usernameExists)
-                throw new InvalidOperationException(
+                throw new ConflictException(
                     "Username is already in use");
 
 
         }
 
         if(request.MfaEnabled == true && string.IsNullOrWhiteSpace(user.MfaSecret))
-            throw new InvalidOperationException("MFA setup must be completed before enabling MFA");
+            throw new ConflictException("MFA setup must be completed before enabling MFA");
         
         if(request.Email is not null)
             user.Email = request.Email;

@@ -49,23 +49,23 @@ namespace TerraLink.Api.Endpoints
             return group;
         }
 
-        private static async Task<IResult> 
+        private static async Task<IResult>
         GetMeAsync(
             ClaimsPrincipal user,
             IUserService userService,
             CancellationToken cancellationToken
             )
-        {      
+        {
             //get user id using an extension method
-            var userId = user.GetUserId(); 
-            
+            var userId = user.GetUserId();
+
             //call the service
             var profile = await userService.GetMeAsync(
                 userId,
                 cancellationToken
             );
 
-            if(profile is null)
+            if (profile is null)
                 return Results.NotFound();
 
             return Results.Ok(profile);
@@ -131,15 +131,15 @@ namespace TerraLink.Api.Endpoints
 
         private static UserProfileResponse ToResponseDto(User u) => new UserProfileResponse
         (
-            Id : u.Id,
-            Username : u.Username,
-            Email : u.Email,
-            EmployeeNo : u.EmployeeNo,
-            RoleName : u.Role.Name,
-            Status : u.Status,
-            MfaEnabled : u.MfaEnabled,
-            LastLogin : u.LastLogin,
-            CreatedAt : u.CreatedAt
+            Id: u.Id,
+            Username: u.Username,
+            Email: u.Email,
+            EmployeeNo: u.EmployeeNo,
+            RoleName: u.Role.Name,
+            Status: u.Status,
+            MfaEnabled: u.MfaEnabled,
+            LastLogin: u.LastLogin,
+            CreatedAt: u.CreatedAt
         );
 
         // ---------------------------------------------------------------
@@ -147,20 +147,30 @@ namespace TerraLink.Api.Endpoints
         // ---------------------------------------------------------------
         private static async Task<IResult> UpdateMeAsync(
                 UpdateProfileRequest request,
-                ClaimsPrincipal principal,                                                                                                                                                                                                                                                                                                                                                                                                                             
+                ClaimsPrincipal principal,
                 IUserService userService,
                 CancellationToken cancellationToken
                 )
         {
-            var userId = principal.GetUserId();
+            try
+            {
+                var userId = principal.GetUserId();
 
-            var profile = await userService.UpdateMeAsync(userId,request,cancellationToken);
+                var profile = await userService.UpdateMeAsync(userId, request, cancellationToken);
 
-            if(profile is null)
-                return Results.NotFound(); 
+                if (profile is null)
+                    return Results.NotFound();
 
-            return Results.Ok(profile);
-            
+                return Results.Ok(profile);
+
+            } catch(Exception ex)
+
+            {
+                return Results.Conflict(
+                    new ConflictException(ex.Message)
+                );
+            }
+
         }
 
     }

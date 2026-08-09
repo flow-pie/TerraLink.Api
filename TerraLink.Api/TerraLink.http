@@ -93,7 +93,7 @@ Content-Type: application/json
 {
     "email": "loan.officer@terralink.org",
     "username": "0798765431",
-    "mfaEnabled": false
+    "mfaEnabled": true
 }
 
 ### Create user
