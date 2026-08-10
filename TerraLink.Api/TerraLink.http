@@ -133,7 +133,12 @@ DELETE {{baseUrl}}/users/2
 ###############################################################################
 
 ###
+//GET all clients pagination
 GET {{baseUrl}}/api/clients?page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Get client by id
+GET {{baseUrl}}/api/clients/5
 Authorization: Bearer {{accessToken}}
 
 

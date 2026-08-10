@@ -394,4 +394,41 @@ public class ClientService(
             TotalCount: totalCount
         );
     }
+
+   public async Task<
+        ClientProfileResponse?
+    > GetClientByIdAsync(
+        long clientId, 
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Users
+            .Include(u => u.Role)
+            .Include(u => u.Client)
+            .Where(u => u.Role.Name == "client")
+            .SingleOrDefaultAsync(
+                u => u.Id == clientId,
+                cancellationToken
+            );
+
+        if(user is null)
+            return null;
+
+        return new ClientProfileResponse(
+            user.Id,
+            user.Username,
+            user.Email,
+            user.EmployeeNo,
+            user.Role.Name,
+            user.LastLogin,
+            user.Client!.NationalId,
+            user.Client.Phone,
+            user.Client.FullName,
+            user.Client.DateOfBirth,
+            user.Client.Gender,
+            user.Client.VerifiedAt,
+            user.Client.Address,
+            user.Client.Status,
+            user.Client.VerificationStatus
+        );
+    }
 }

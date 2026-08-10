@@ -17,4 +17,9 @@ public interface IClientService
         int pageSize,
         CancellationToken cancellationToken
     );
+
+    Task<ClientProfileResponse?> GetClientByIdAsync(
+        long userId,
+        CancellationToken cancellationToken
+    );
 }

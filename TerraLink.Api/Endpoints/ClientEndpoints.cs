@@ -15,7 +15,7 @@ public static class ClientEndpoints
     {
         var group = app.MapGroup("/api/clients")
             .WithTags("Clients").DisableAntiforgery();
-        
+
         //GET /api/clients/register
         group.MapPost(
             "/register",
@@ -27,8 +27,35 @@ public static class ClientEndpoints
         group.MapGet("/", GetAllClientsAsync)
             .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));//only loan officers can call this endpoint
 
+        //GET /api/clients/{clientId}
+        group.MapGet("/{clientId}", GetClientByIdAsync)
+            .RequireAuthorization(policy => policy.RequireRole("Loan Officer", "Client"));
 
         return group;
+    }
+
+    private static async Task<IResult> GetClientByIdAsync(
+           long clientId,
+           IClientService clientService,
+           ClaimsPrincipal user,
+           CancellationToken cancellationToken
+       )
+    {
+        //Get current user from claim principal
+        var loggedInUserId = user.GetUserId();
+
+        //check if logged in user is a loan officer
+        var isLoanOfficer = user.IsInRole("Loan Officer");
+        
+        if(!isLoanOfficer && loggedInUserId != clientId)
+            Results.Forbid();
+
+        var result = await clientService.GetClientByIdAsync(clientId, cancellationToken);
+
+        if (result is null)
+            return Results.NotFound($"Client with id {clientId} doesn't exist");
+
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> GetAllClientsAsync(
@@ -50,7 +77,7 @@ public static class ClientEndpoints
 
     private static async Task<IResult>
         RegisterAsync(
-            [FromForm] 
+            [FromForm]
             RegisterClientRequest request,
             ClaimsPrincipal user,
             IClientService clientService,
