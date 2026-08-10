@@ -31,7 +31,73 @@ public static class ClientEndpoints
         group.MapGet("/{clientId}", GetClientByIdAsync)
             .RequireAuthorization(policy => policy.RequireRole("Loan Officer", "Client"));
 
+        //PATCH /api/clients/{clientId}
+        group.MapPatch("/{clientId}", UpdateClientAsync)
+            .RequireAuthorization(policy => policy.RequireRole("Loan Officer", "Client"));
+
+        //PUT /api/clients/{clientId}/verify
+        group.MapPost("/{clientId}", VerifyClientAsync)
+            .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));
+
+
         return group;
+    }
+
+    private static async Task<IResult> VerifyClientAsync(
+        long clientId,
+        IClientService clientService,
+        ClaimsPrincipal principal,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var officerId = principal.GetUserId();
+
+            var result = await clientService.VerifyClientAsync(
+                clientId,
+                officerId,
+                cancellationToken);
+
+            if(result is null)
+                return Results.NotFound($"Client id {clientId} not found");
+
+            return Results.Ok(result);
+
+        }catch(ConflictException ex)
+        {
+            return Results.Conflict(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
+    private static async Task<IResult> UpdateClientAsync(
+      long clientId,
+      UpdateClientRequest request,
+      IClientService clientService,
+      CancellationToken cancellationToken)
+    {
+        try
+        {
+            var client = await clientService.UpdateClientAsync(
+                clientId,
+                request,
+                cancellationToken);
+
+            if (client is null)
+                return Results.NotFound($"Client with id {clientId} not found");
+
+            return Results.Ok(client);
+        }
+        catch (ConflictException ex)
+        {
+            return Results.Conflict(new
+            {
+                message = ex.Message
+            });
+        }
     }
 
     private static async Task<IResult> GetClientByIdAsync(
@@ -46,8 +112,8 @@ public static class ClientEndpoints
 
         //check if logged in user is a loan officer
         var isLoanOfficer = user.IsInRole("Loan Officer");
-        
-        if(!isLoanOfficer && loggedInUserId != clientId)
+
+        if (!isLoanOfficer && loggedInUserId != clientId)
             Results.Forbid();
 
         var result = await clientService.GetClientByIdAsync(clientId, cancellationToken);

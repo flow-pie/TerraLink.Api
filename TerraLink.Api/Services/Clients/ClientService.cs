@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
+using TerraLink.Api.Common;
 using TerraLink.Api.Data;
 using TerraLink.Api.DTOs;
 using TerraLink.Api.DTOs.Clients;
@@ -32,8 +34,8 @@ public class ClientService(
 
         var existingNationalId =
             await dbContext.Clients.AnyAsync(
-                user =>
-                    user.NationalId == nationalId,
+                client =>
+                    client.NationalId == nationalId,
                 cancellationToken
             );
 
@@ -46,8 +48,8 @@ public class ClientService(
 
         var existingPhone =
             await dbContext.Clients.AnyAsync(
-                user =>
-                    user.Phone == phone,
+                client =>
+                    client.Phone == phone,
                 cancellationToken
             );
 
@@ -62,10 +64,10 @@ public class ClientService(
         if (authenticatedUserId is not null)
         {
             officer = await dbContext.Users
-                .Include(user => user.Role)
+                .Include(client => client.Role)
                 .SingleOrDefaultAsync(
-                    user =>
-                        user.Id ==
+                    client =>
+                        client.Id ==
                         authenticatedUserId.Value,
                     cancellationToken
                 );
@@ -102,8 +104,8 @@ public class ClientService(
 
             var emailExists =
                 await dbContext.Users.AnyAsync(
-                    user =>
-                        user.Email == email,
+                    client =>
+                        client.Email == email,
                     cancellationToken
                 );
 
@@ -184,7 +186,7 @@ public class ClientService(
 
             var now = DateTime.UtcNow;
 
-            var    user =
+            var client =
                 new Client
                 {
                     ClientNo =
@@ -243,7 +245,7 @@ public class ClientService(
                 };
 
             dbContext.Clients.Add(
-                user
+                client
             );
 
             await dbContext.SaveChangesAsync(
@@ -254,7 +256,7 @@ public class ClientService(
             {
                 new()
                 {
-                    ClientId =     user.Id,
+                    ClientId =      client.Id,
                     DocType = KycDocType.ID_FRONT,
                     FileUrl = nationalIdFront,
                     Verified = isOfficerRegistration,
@@ -266,7 +268,7 @@ public class ClientService(
 
                 new()
                 {
-                    ClientId =     user.Id,
+                    ClientId =      client.Id,
                     DocType = KycDocType.ID_BACK,
                     FileUrl = nationalIdBack,
                     Verified = isOfficerRegistration,
@@ -278,7 +280,7 @@ public class ClientService(
 
                 new()
                 {
-                    ClientId =     user.Id,
+                    ClientId =      client.Id,
                     DocType = KycDocType.PASSPORT_PHOTO,
                     FileUrl = passport,
                     Verified = isOfficerRegistration,
@@ -302,15 +304,15 @@ public class ClientService(
             return new ClientRegistrationResult(
                 ClientRegistrationStatus.Success,
                 new RegisterClientResponse(
-                    ClientId:      user.Id,
+                    ClientId: client.Id,
                     UserId: clientUser?.Id,
                     ClientNo:
-                        user.ClientNo!,
+                        client.ClientNo!,
                     RegistrationChannel:
-                        user.RegistrationChannel
+                        client.RegistrationChannel
                             .ToString(),
                     VerificationStatus:
-                        user.VerificationStatus
+                        client.VerificationStatus
                             .ToString(),
                     Message:
                         isOfficerRegistration
@@ -367,23 +369,23 @@ public class ClientService(
             .OrderBy(u => u.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Include(user => user.Client)
-            .Select( user => new ClientsListItemResponse(
-                user.Id,
-                user.Username,
-                user.Email,
-                user.EmployeeNo,
-                user.Role.Name,
-                user.LastLogin,
-                user.Client!.NationalId,
-                user.Client.Phone,
-                user.Client.FullName,
-                user.Client.DateOfBirth,
-                user.Client.Gender,
-                user.Client.VerifiedAt,
-                user.Client.Address,
-                user.Client.Status,
-                user.Client.VerificationStatus
+            .Include(client => client.Client)
+            .Select(client => new ClientsListItemResponse(
+                client.Id,
+                client.Username,
+                client.Email,
+                client.EmployeeNo,
+                client.Role.Name,
+                client.LastLogin,
+                client.Client!.NationalId,
+                client.Client.Phone,
+                client.Client.FullName,
+                client.Client.DateOfBirth,
+                client.Client.Gender,
+                client.Client.VerifiedAt,
+                client.Client.Address,
+                client.Client.Status,
+                client.Client.VerificationStatus
             )).ToListAsync(cancellationToken);
 
         //build the response
@@ -395,13 +397,13 @@ public class ClientService(
         );
     }
 
-   public async Task<
-        ClientProfileResponse?
-    > GetClientByIdAsync(
-        long clientId, 
-        CancellationToken cancellationToken)
+    public async Task<
+         ClientProfileResponse?
+     > GetClientByIdAsync(
+         long clientId,
+         CancellationToken cancellationToken)
     {
-        var user = await dbContext.Users
+        var client = await dbContext.Users
             .Include(u => u.Role)
             .Include(u => u.Client)
             .Where(u => u.Role.Name == "client")
@@ -410,25 +412,149 @@ public class ClientService(
                 cancellationToken
             );
 
-        if(user is null)
+        if (client is null)
             return null;
 
         return new ClientProfileResponse(
-            user.Id,
-            user.Username,
-            user.Email,
-            user.EmployeeNo,
-            user.Role.Name,
-            user.LastLogin,
-            user.Client!.NationalId,
-            user.Client.Phone,
-            user.Client.FullName,
-            user.Client.DateOfBirth,
-            user.Client.Gender,
-            user.Client.VerifiedAt,
-            user.Client.Address,
-            user.Client.Status,
-            user.Client.VerificationStatus
+            client.Id,
+            client.Username,
+            client.Email,
+            client.EmployeeNo,
+            client.Role.Name,
+            client.LastLogin,
+            client.Client!.NationalId,
+            client.Client.Phone,
+            client.Client.FullName,
+            client.Client.DateOfBirth,
+            client.Client.Gender,
+            client.Client.VerifiedAt,
+            client.Client.Address,
+            client.Client.Status,
+            client.Client.VerificationStatus
         );
+    }
+
+    public async Task<ClientProfileResponse?> UpdateClientAsync(
+        long clientId,
+        UpdateClientRequest request,
+        CancellationToken cancellationToken)
+    {
+        //find the client
+        var client = await dbContext.Clients
+        .Include(c => c.User)
+        .Include(c => c.User!.Role)
+        .SingleOrDefaultAsync(c => c.User!.Id == clientId,
+        cancellationToken);
+
+        if (client is null)
+            return null;
+
+        if (request.Phone is not null)
+        {
+            var phoneExists = await dbContext.Clients
+                .AnyAsync(
+                    c => c.User!.Id != clientId &&
+                    c.Phone == request.Phone,
+                    cancellationToken
+                );
+
+            if (phoneExists)
+                throw new ConflictException("Phone is already in use");
+        }
+
+        if (request.NationalId is not null)
+        {
+            var nationalIdExists = await dbContext.Clients
+                .AnyAsync(
+                    c => c.NationalId == request.NationalId &&
+                         c.User!.Id != clientId,
+                    cancellationToken);
+
+            if (nationalIdExists)
+                throw new ConflictException(
+                    "National ID is already in use.");
+        }
+
+        if (request.Phone is not null)
+            client.Phone = request.Phone;
+
+        if (request.NationalId is not null)
+            client.NationalId = request.NationalId;
+
+
+        if (request.FullName is not null)
+            client.FullName = request.FullName;
+
+        if (request.Address is not null)
+            client.Address = request.Address;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return new ClientProfileResponse(
+           client.Id,
+           client.User!.Username,
+           client.User.Email,
+           client.User.EmployeeNo,
+           client.User.Role.Name,
+           client.User.LastLogin,
+           client.NationalId,
+           client.Phone,
+           client.FullName,
+           client.DateOfBirth,
+           client.Gender,
+           client.VerifiedAt,
+           client.Address,
+           client.Status,
+           client.VerificationStatus
+       );
+
+
+    }
+
+    public async Task<ClientProfileResponse?> VerifyClientAsync(
+        long clientId,
+        long officerId,
+        CancellationToken cancellationToken)
+    {
+        var client = await dbContext.Clients
+        .Include(c => c.User)
+        .SingleOrDefaultAsync(
+            c => c.User!.Id == clientId,
+            cancellationToken);
+
+        if (client is null)
+            return null;
+
+        if (client.VerificationStatus != VerificationStatus.PENDING)
+        {
+            throw new ConflictException(
+                "Client verification status is not currently pending.");
+        }
+
+        client.VerificationStatus = VerificationStatus.VERIFIED;
+
+        client.VerifiedBy = officerId;
+
+        client.VerifiedAt = DateTime.UtcNow;
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return new ClientProfileResponse(
+           client.Id,
+           client.User!.Username,
+           client.User.Email,
+           client.User.EmployeeNo,
+           client.User.Role.Name,
+           client.User.LastLogin,
+           client.NationalId,
+           client.Phone,
+           client.FullName,
+           client.DateOfBirth,
+           client.Gender,
+           client.VerifiedAt,
+           client.Address,
+           client.Status,
+           client.VerificationStatus
+       );
     }
 }

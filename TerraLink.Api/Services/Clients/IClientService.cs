@@ -11,7 +11,7 @@ public interface IClientService
         CancellationToken cancellationToken
     );
 
-    Task<PagedResponse<ClientsListItemResponse>> 
+    Task<PagedResponse<ClientsListItemResponse>>
     GetAllClientsAsync(
         int page,
         int pageSize,
@@ -20,6 +20,16 @@ public interface IClientService
 
     Task<ClientProfileResponse?> GetClientByIdAsync(
         long userId,
+        CancellationToken cancellationToken
+    );
+    Task<ClientProfileResponse?> UpdateClientAsync(
+        long clientId,
+        UpdateClientRequest request,
+        CancellationToken cancellationToken
+    );
+    Task<ClientProfileResponse?> VerifyClientAsync(
+        long clientId,
+        long officerId,
         CancellationToken cancellationToken
     );
 }

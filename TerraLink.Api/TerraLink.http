@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:5031
 @boundary = TerraLinkBoundary
 
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDc5ODc2NTQzMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6Ijk5MDljZjcxLTZiMTQtNGU4OC04MDk0LTU0ZTE5NmM2YzA1NiIsImV4cCI6MTc4NjM1MjMzMCwiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.5kmbn2vf15o53Vl9NhCsCW5HrGHncwKytPUuqMWeuLg
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDc5ODc2NTQzMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6IjlhYzJlMjZlLTM4YWQtNDgxYS1hMzY4LTc0MmM5YzhiODNkNSIsImV4cCI6MTc4NjM2MzU1OCwiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.8q3uQiCS_0gDoanqzWhthda_uo-aeZH_G3sVOBtA3E8
 @refreshToken = KjSa+1YcRaqUTD+TR9AnqQTlkpzKPyVpj+5x76co4i6N9TbBdT28FNiTw49t6Wq8rdeVJJcT0vIHt99m6/JM6w==
 @mfaTokenFromLogin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJ0b2tlbl90eXBlIjoibWZhIiwiZXhwIjoxNzg2MDE0NTYyLCJpc3MiOiJUZXJyYUxpbmsuQXBpIiwiYXVkIjoiVGVycmFMaW5rLkNsaWVudCJ9.-RDF-75FQrAk7iM6obGVfflrBmIYIYEBBO0zvtOKNZM
 @loanOfficerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDcxOTE0NDMwNyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6Ijg2ZDRkODAzLWE1MmMtNDg1OS1hMWQwLWQxZDUxNjg0ZTJkMSIsImV4cCI6MTc4NjAxNzk5MywiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.xBIOKRHjCw2SBRHykNd_Cda0PcXyx5L-npE-mX56h7Q
@@ -23,9 +23,14 @@ POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
 {
-    "identifier": "TL-8842",
+    "identifier":"TL-8842",
     "password": "Admin@terralink26"
 }
+
+# {
+#     "identifier": "TC-039F",
+#     "password": "Terralink@2026"
+# }
 
 ### Refresh token
 POST {{baseUrl}}/api/auth/refresh
@@ -75,15 +80,15 @@ Content-Type: application/json
 # USERS  (staff: admins, loan officers, etc.)
 ###############################################################################
 
-### GET logged in user profile
+### GET logged in user/client profile
 GET {{baseUrl}}/api/users/me
 Authorization: Bearer {{accessToken}}
 
-### List all users
-GET {{baseUrl}}/api/users
+# ### List all users
+# GET {{baseUrl}}/api/users
 
 ### Get user by id
-GET {{baseUrl}}/api/users/5
+GET {{baseUrl}}/api/users/2
 Authorization: Bearer {{accessToken}}
 
 ### patch logged in user
@@ -139,6 +144,23 @@ Authorization: Bearer {{accessToken}}
 
 ### Get client by id
 GET {{baseUrl}}/api/clients/5
+Authorization: Bearer {{accessToken}}
+
+###
+//PATCH client
+PATCH {{baseUrl}}/api/clients/5
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{ 
+  "phone": "0712408290", 
+  "nationalId":"42572240",
+  "fullName": "John Maina",
+  "address": "Plot 45B, Industrial Area, East Cluster" 
+} 
+### Verify clients
+//
+POST {{baseUrl}}/api/clients/5
 Authorization: Bearer {{accessToken}}
 
 

@@ -16,4 +16,5 @@ public interface IUserService
         long userId,
         CancellationToken cancellationToken
     );
+    
 }
