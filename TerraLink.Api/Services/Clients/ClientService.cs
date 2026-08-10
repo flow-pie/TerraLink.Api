@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 using TerraLink.Api.Data;
 using TerraLink.Api.DTOs;
 using TerraLink.Api.DTOs.Clients;
@@ -366,14 +367,23 @@ public class ClientService(
             .OrderBy(u => u.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Include(user => user.Client)
             .Select( user => new ClientsListItemResponse(
                 user.Id,
                 user.Username,
                 user.Email,
                 user.EmployeeNo,
                 user.Role.Name,
-                user.Status.ToString(),
-                user.LastLogin
+                user.LastLogin,
+                user.Client!.NationalId,
+                user.Client.Phone,
+                user.Client.FullName,
+                user.Client.DateOfBirth,
+                user.Client.Gender,
+                user.Client.VerifiedAt,
+                user.Client.Address,
+                user.Client.Status,
+                user.Client.VerificationStatus
             )).ToListAsync(cancellationToken);
 
         //build the response

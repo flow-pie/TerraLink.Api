@@ -5,14 +5,12 @@ using TerraLink.Api.Common;
 using TerraLink.Api.Data;
 using TerraLink.Api.DTOs.Users;
 using TerraLink.Api.Models;
+using TerraLink.Api.Services.Clients;
 
 namespace TerraLink.Api.Endpoints
 {
     public static class UserEndpoints
     {
-        private const string GetUserByIdEndpointName = "GetUserById";
-        private const string LoanOfficerRole = "Loan Officer";
-
         public static RouteGroupBuilder MapUserEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/users")
@@ -30,15 +28,9 @@ namespace TerraLink.Api.Endpoints
             group.MapPatch("/me", UpdateMeAsync)
                 .RequireAuthorization();
 
-            //GET /api/users/{id}
-            group.MapGet("/{id:long}", GetUserById)
-            .WithName(GetUserByIdEndpointName);
-            //.RequireAuthorization(policy => policy.RequireRole(LoanOfficerRole)); TODO: Uncomment this line to require authorization for this endpoint.
-
-
-            //POST api/user
-            group.MapPost("/", CreateOfficer);
-            //.RequireAuthorization(policy => policy.RequireRole(LoanOfficerRole)); TODO: Uncomment this line to require authorization for this endpoint.
+            //GET /api/users/{userId}
+            group.MapGet("/{userId}", GetUserByIdAsync)
+                .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));
 
             return group;
         }
@@ -70,9 +62,18 @@ namespace TerraLink.Api.Endpoints
             throw new NotImplementedException();
         }
 
-        private static async Task GetUserById(HttpContext context)
+        private static async Task<IResult> GetUserByIdAsync(
+            long userId,
+            IUserService userService,
+            CancellationToken cancellationToken
+        )
         {
-            throw new NotImplementedException();
+            var result = await userService.GetUserByIdAsync(userId, cancellationToken);
+
+            if(result is null)
+                return Results.NotFound($"User id {userId} doesn't exist");
+
+            return Results.Ok(result);
         }
 
         private static async Task CreateOfficer(HttpContext context)
@@ -115,26 +116,6 @@ namespace TerraLink.Api.Endpoints
 
         //     });
 
-        private static long GetCurrentUserId(ClaimsPrincipal principal)
-        {
-            var claim = principal.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new InvalidOperationException("Token does not contain a NameIdentifier claim.");
-
-            return long.Parse(claim);
-        }
-
-        private static UserProfileResponse ToResponseDto(User u) => new UserProfileResponse
-        (
-            Id: u.Id,
-            Username: u.Username,
-            Email: u.Email,
-            EmployeeNo: u.EmployeeNo,
-            RoleName: u.Role.Name,
-            Status: u.Status,
-            MfaEnabled: u.MfaEnabled,
-            LastLogin: u.LastLogin,
-            CreatedAt: u.CreatedAt
-        );
 
         // ---------------------------------------------------------------
         // PATCH /api/users/me

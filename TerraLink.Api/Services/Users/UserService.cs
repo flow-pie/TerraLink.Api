@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TerraLink.Api.Common;
 using TerraLink.Api.Data;
 using TerraLink.Api.DTOs.Users;
+using TerraLink.Api.Models;
 
 public class UserService(
     TerraLinkDbContext dbContext
@@ -29,6 +30,36 @@ public class UserService(
                MfaEnabled: user.MfaEnabled,
                LastLogin:user.LastLogin,
                CreatedAt: user.CreatedAt
+        );
+    }
+
+    public async Task<
+        UserProfileResponse?
+    > GetUserByIdAsync(
+        long userId, 
+        CancellationToken cancellationToken)
+    {
+        var user = await dbContext.Users
+            .Include(u => u.Role)
+            .Where(u => u.Role.Name != "client")
+            .SingleOrDefaultAsync(
+                u => u.Id == userId,
+                cancellationToken
+            );
+
+        if(user is null)
+            return null;
+
+        return new UserProfileResponse(
+            Id: user.Id,
+            Username: user.Username,
+            Email: user.Email,
+            EmployeeNo: user.EmployeeNo,
+            RoleName: user.Role.Name,
+            Status : user.Status,
+            MfaEnabled : user.MfaEnabled,
+            LastLogin: user.LastLogin,
+            CreatedAt: user.CreatedAt
         );
     }
 

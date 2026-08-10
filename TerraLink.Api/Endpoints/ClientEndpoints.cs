@@ -23,7 +23,7 @@ public static class ClientEndpoints
         )
         .AllowAnonymous();
 
-        //GET /api/users?page=&pageSize=
+        //GET /api/clients?page=&pageSize=
         group.MapGet("/", GetAllClientsAsync)
             .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));//only loan officers can call this endpoint
 

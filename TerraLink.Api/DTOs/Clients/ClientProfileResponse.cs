@@ -4,7 +4,7 @@ using TerraLink.Api.Models;
 namespace TerraLink.Api.DTOs.Clients
 {
     //for GET /api/users list view.
-    public record ClientsListItemResponse
+    public record ClientProfileResponse
     (
         //from users entity
         long Id,

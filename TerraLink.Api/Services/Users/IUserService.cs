@@ -11,5 +11,9 @@ public interface IUserService
         UpdateProfileRequest request,
         CancellationToken cancellationToken
     );
-
+    
+    Task<UserProfileResponse?> GetUserByIdAsync(
+        long userId,
+        CancellationToken cancellationToken
+    );
 }
