@@ -35,12 +35,46 @@ public static class ClientEndpoints
         group.MapPatch("/{clientId}", UpdateClientAsync)
             .RequireAuthorization(policy => policy.RequireRole("Loan Officer", "Client"));
 
-        //PUT /api/clients/{clientId}/verify
-        group.MapPost("/{clientId}", VerifyClientAsync)
+        //POST /api/clients/{clientId}/verify
+        group.MapPost("/{clientId}/verify", VerifyClientAsync)
             .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));
 
+        //POST /api/clients/{clientId}/reject
+        group.MapPost("/{clientId}/reject", RejectClientAsync)
+            .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));
 
         return group;
+    }
+
+    private static async Task<IResult> RejectClientAsync(
+        long clientId,
+        RejectClientRequest request,
+        IClientService clientService,
+        ClaimsPrincipal principal,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var officerId = principal.GetUserId();
+
+            var result = await clientService.RejectClientAsync(clientId, officerId, request.Reason.Trim(), cancellationToken);
+
+            if (result is null)
+                return Results.NotFound();
+
+            return Results.Ok(result);
+
+        }
+        catch (ConflictException ex)
+        {
+            return Results.Conflict(
+                new
+                {
+                    message = ex.Message
+                }
+            );
+        }
     }
 
     private static async Task<IResult> VerifyClientAsync(
@@ -59,12 +93,13 @@ public static class ClientEndpoints
                 officerId,
                 cancellationToken);
 
-            if(result is null)
+            if (result is null)
                 return Results.NotFound($"Client id {clientId} not found");
 
             return Results.Ok(result);
 
-        }catch(ConflictException ex)
+        }
+        catch (ConflictException ex)
         {
             return Results.Conflict(new
             {

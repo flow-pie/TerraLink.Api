@@ -50,4 +50,10 @@ public class Client
     public DateTime? VerifiedAt { get; set; }
 
     public ClientStatus Status { get; set; } = ClientStatus.ACTIVE;
+
+    [MaxLength(500)]
+    public string? RejectionReason { get; set; }
+
+    public long? RejectedBy { get; set; }
+    public DateTime? RejectedAt { get; set; }
 }

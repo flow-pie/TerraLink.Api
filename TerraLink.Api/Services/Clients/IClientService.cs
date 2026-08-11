@@ -32,4 +32,11 @@ public interface IClientService
         long officerId,
         CancellationToken cancellationToken
     );
+
+    Task<RejectClientResponse?> RejectClientAsync(
+        long clientId,
+        long officerId,
+        string reason,
+        CancellationToken cancellationToken
+    );
 }
