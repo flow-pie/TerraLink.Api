@@ -71,6 +71,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IKycDocumentService, KycDocumentService>();
 
 builder.Services.AddAuthorization();
 
@@ -93,6 +94,7 @@ app.UseStaticFiles();
 app.MapAuthEndpoints();
 app.MapUserEndpoints();
 app.MapClientEndpoints();
+app.MapKycEndpoints();
 
 //perform database migration on startup
 app.DbMigrate();

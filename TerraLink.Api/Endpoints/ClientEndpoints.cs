@@ -43,8 +43,44 @@ public static class ClientEndpoints
         group.MapPost("/{clientId}/reject", RejectClientAsync)
             .RequireAuthorization(policy => policy.RequireRole("Loan Officer"));
 
+        group.MapGet("/{clientId}/kyc-documents", GetClientDocumentsAsync)
+        .RequireAuthorization(
+            policy => policy.RequireRole("Loan Officer", "Client")
+        );
+
         return group;
     }
+
+    private static async Task<IResult> GetClientDocumentsAsync(
+        long clientId,
+        IKycDocumentService kycDocumentService,
+        ClaimsPrincipal principal,
+        CancellationToken cancellationToken)
+    {
+        var loggedInUserId = principal.GetUserId();
+
+        var isLoanOfficer = principal.IsInRole("Loan Officer");
+
+        if (!isLoanOfficer)
+        {
+            var isOwner = await kycDocumentService
+                .IsClientOwnerAsync(
+                    clientId,
+                    loggedInUserId,
+                    cancellationToken);
+
+            if (!isOwner)
+                return Results.Forbid();
+        }
+
+        var documents = await kycDocumentService
+            .GetClientDocumentsAsync(
+                clientId,
+                cancellationToken);
+
+        return Results.Ok(documents);
+    }
+
 
     private static async Task<IResult> RejectClientAsync(
         long clientId,

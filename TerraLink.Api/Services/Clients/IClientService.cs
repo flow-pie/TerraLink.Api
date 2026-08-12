@@ -38,5 +38,5 @@ public interface IClientService
         long officerId,
         string reason,
         CancellationToken cancellationToken
-    );
+    );    
 }
