@@ -8,4 +8,9 @@ public interface ILoanProductService
         bool includeInactive,
         CancellationToken cancellationToken
     );
+
+    Task<LoanProductResponse> CreateAsync(
+        CreateLoanProductRequest request,
+        CancellationToken cancellationToken
+    );
 }
