@@ -9,6 +9,7 @@ using System.Text;
 using TerraLink.Api.Services.Auth;
 using TerraLink.Api.Services.Clients;
 using System.Text.Json.Serialization;
+using TerraLink.Api.Services.LoanProducts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +73,7 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IKycDocumentService, KycDocumentService>();
+builder.Services.AddScoped<ILoanProductService, LoanProductService>();
 
 builder.Services.AddAuthorization();
 
@@ -95,6 +97,7 @@ app.MapAuthEndpoints();
 app.MapUserEndpoints();
 app.MapClientEndpoints();
 app.MapKycEndpoints();
+app.MapLoanProductEndpoints();
 
 //perform database migration on startup
 app.DbMigrate();

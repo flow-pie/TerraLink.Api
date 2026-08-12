@@ -282,3 +282,14 @@ Authorization: Bearer {{accessToken}}
 ### Verify KYC document
 POST {{baseUrl}}/api/kyc-documents/19/verify
 Authorization: Bearer {{accessToken}}
+
+
+
+###############################################################################
+# LOAN PRODUCTS
+###############################################################################
+
+### Get all loan products
+//query parameter is optional here
+GET {{baseUrl}}/api/loan-products?includeInactive=true
+Authorization: Bearer {{accessToken}}
