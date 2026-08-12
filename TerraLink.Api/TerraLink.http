@@ -1,7 +1,7 @@
 @baseUrl = http://localhost:5031
 @boundary = TerraLinkBoundary
 
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDc5ODc2NTQzMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6ImIxOTg1YjgyLTc0NjEtNDAyZS1hYWY2LWMyODJmNTgwMmZhMyIsImV4cCI6MTc4NjQ2NDAzNCwiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.Hj7tcRUE8bMPhVFpZPgJJOZA-RXXmneVFkbqQv32Sys
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDc5ODc2NTQzMSIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6IjVhMzM2OGUxLWMzOTYtNDM5ZC1hOTMzLTlkNzU3YmRiYmMzNiIsImV4cCI6MTc4NjQ4MTYzNiwiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ._zG46c_lQbHl_Mp6H3OuWzwCUcIoDYf3YTLL9hKTMDk
 @refreshToken = KjSa+1YcRaqUTD+TR9AnqQTlkpzKPyVpj+5x76co4i6N9TbBdT28FNiTw49t6Wq8rdeVJJcT0vIHt99m6/JM6w==
 @mfaTokenFromLogin = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJ0b2tlbl90eXBlIjoibWZhIiwiZXhwIjoxNzg2MDE0NTYyLCJpc3MiOiJUZXJyYUxpbmsuQXBpIiwiYXVkIjoiVGVycmFMaW5rLkNsaWVudCJ9.-RDF-75FQrAk7iM6obGVfflrBmIYIYEBBO0zvtOKNZM
 @loanOfficerToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMDcxOTE0NDMwNyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkxvYW4gT2ZmaWNlciIsImp0aSI6Ijg2ZDRkODAzLWE1MmMtNDg1OS1hMWQwLWQxZDUxNjg0ZTJkMSIsImV4cCI6MTc4NjAxNzk5MywiaXNzIjoiVGVycmFMaW5rLkFwaSIsImF1ZCI6IlRlcnJhTGluay5DbGllbnQifQ.xBIOKRHjCw2SBRHykNd_Cda0PcXyx5L-npE-mX56h7Q
@@ -22,15 +22,15 @@ GET {{baseUrl}}
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
-{
-    "identifier":"TL-8842",
-    "password": "Admin@terralink26"
-}
-
 # {
-#     "identifier": "TC-039F",
-#     "password": "Terralink@2026"
+#     "identifier":"TL-8842",
+#     "password": "Admin@terralink26"
 # }
+
+{
+    "identifier": "TC-F15F",
+    "password": "Terralink@2026"
+}
 
 ### Refresh token
 POST {{baseUrl}}/api/auth/refresh
@@ -160,7 +160,7 @@ Content-Type: application/json
 } 
 ### Verify clients
 //
-POST {{baseUrl}}/api/clients/8/verify
+POST {{baseUrl}}/api/clients/9/verify
 Authorization: Bearer {{accessToken}}
 
 ### Verify reject

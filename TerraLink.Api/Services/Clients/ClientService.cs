@@ -59,10 +59,10 @@ public class ClientService(
         if (authenticatedUserId is not null)
         {
             officer = await dbContext.Users
-                .Include(client => client.Role)
+                .Include(user => user.Role)
                 .SingleOrDefaultAsync(
-                    client =>
-                        client.Id ==
+                    user =>
+                        user.Id ==
                         authenticatedUserId.Value,
                     cancellationToken
                 );

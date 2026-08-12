@@ -44,6 +44,7 @@ namespace TerraLink.Api.Services.Auth
                 return new LoginResult(
                     LoginStatus.InvalidCredentials
                 ); // password does not match
+                
 
             if (user.Status != UserStatus.ACTIVE)
                 return new LoginResult(

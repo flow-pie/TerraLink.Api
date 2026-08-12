@@ -44,8 +44,8 @@ public class LocalFileStorageService : IFileStorageService
             File.Create(fullPath);
 
         await file.CopyToAsync(stream, cancellationToken);
-
-        return $"/uploads/{folder}/{fileName}";
+        
+        return $"/uploads/{folderName}/{fileName}";
     }
 
     public Task DeleteAsync(

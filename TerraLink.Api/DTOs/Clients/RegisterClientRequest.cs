@@ -30,7 +30,7 @@ public class RegisterClientRequest
     public string? Password { get; set; }
 
     //KYC documents
-    public required IFormFile? NationalIdFront { get; set; }
-    public required IFormFile? NationalIdBack { get; set; }
-    public required IFormFile? PassportPhoto { get; set; }
+    public required IFormFile NationalIdFront { get; set; }
+    public required IFormFile NationalIdBack { get; set; }
+    public required IFormFile PassportPhoto { get; set; }
 }
