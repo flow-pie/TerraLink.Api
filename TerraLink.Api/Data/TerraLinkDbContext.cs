@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TerraLink.Api.Models;
 
 namespace TerraLink.Api.Data;
 
@@ -169,5 +170,21 @@ public class TerraLinkDbContext(DbContextOptions<TerraLinkDbContext> options) : 
                     .OnDelete(DeleteBehavior.Cascade);
             }
         );
+
+        modelBuilder.Entity<LoanApplication>()
+            .Property(x => x.RequestedAmount)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<LoanProduct>()
+            .Property(x => x.MinimumAmount)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<LoanProduct>()
+            .Property(x => x.MaximumAmount)
+            .HasPrecision(18, 2);
+
+        modelBuilder.Entity<LoanProduct>()
+            .Property(x => x.InterestRate)
+            .HasPrecision(5, 2);
     }
 }

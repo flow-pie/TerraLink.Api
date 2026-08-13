@@ -23,15 +23,15 @@ GET {{baseUrl}}
 POST {{baseUrl}}/api/auth/login
 Content-Type: application/json
 
-{
-    "identifier": "TL-8842",
-    "password": "Admin@terralink26"
-}
-
 # {
-#     "identifier": "TC-F15F",
-#     "password": "Terralink@2026"
+#     "identifier": "TL-8842",
+#     "password": "Admin@terralink26"
 # }
+
+{
+    "identifier": "TC-F15F",
+    "password": "Terralink@2026"
+}
 
 ### Refresh token
 POST {{baseUrl}}/api/auth/refresh
@@ -176,7 +176,7 @@ Content-Type: application/json
 
 ### Officer registers and auto-verifies a client
 POST {{baseUrl}}/api/clients/register
-Authorization: Bearer {{loanOfficerToken}}
+Authorization: Bearer {{accessToken}}
 Content-Type: multipart/form-data; boundary={{boundary}}
 
 --{{boundary}}
@@ -320,3 +320,18 @@ Content-Type: application/json
     "interestRate": 8.5,
     "status": "ACTIVE"
 }
+
+###############################################################################
+# LOAN Applications
+###############################################################################
+###
+POST {{baseUrl}}/api/loan-applications
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{ 
+  "loanProductId": 1, 
+  "requestedAmount": 10000, 
+  "durationMonths": 6, 
+  "purpose": "Poultry Farm Expansion" 
+} 

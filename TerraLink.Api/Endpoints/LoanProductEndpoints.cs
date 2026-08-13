@@ -10,7 +10,8 @@ public static class LoanProductEndpoints
     public static IEndpointRouteBuilder MapLoanProductEndpoints(
         this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/api/loan-products");
+        var group = app.MapGroup("/api/loan-products")
+            .WithTags("Loan Products");
 
         group.MapGet("/", GetLoanProductsAsync)
             .RequireAuthorization(
@@ -27,7 +28,7 @@ public static class LoanProductEndpoints
             .RequireAuthorization(
                 policy => policy.RequireRole("Loan Officer"));
 
-        return app;
+        return group;
     }
 
     private static async Task<IResult> UpdateLoanProductAsync(
