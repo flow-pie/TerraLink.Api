@@ -13,4 +13,10 @@ public interface ILoanProductService
         CreateLoanProductRequest request,
         CancellationToken cancellationToken
     );
+
+    Task<LoanProductResponse?> UpdateAsync(
+        long id,
+        UpdateLoanProductRequest request,
+        CancellationToken cancellationToken
+    );
 }
