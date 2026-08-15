@@ -322,7 +322,7 @@ Content-Type: application/json
 }
 
 ###############################################################################
-# LOAN Applications
+# Loan Applications
 ###############################################################################
 ###
 POST {{baseUrl}}/api/loan-applications
@@ -335,3 +335,27 @@ Authorization: Bearer {{accessToken}}
   "durationMonths": 6, 
   "purpose": "Poultry Farm Expansion" 
 } 
+
+### List loan applications (Loan Officer)
+GET {{baseUrl}}/api/loan-applications?status=APPROVED&page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Get loan application detail (client/ admnin)
+GET {{baseUrl}}/api/loan-applications/2
+Authorization: Bearer {{accessToken}}
+
+### Appraise loan application
+POST {{baseUrl}}/api/loan-applications/2/appraise
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "decision": "APPROVED",
+  "decisionNotes": "Strong repayment history; assets sufficient.",
+  "creditScoreSnapshot": 820
+}
+
+### Get loan application status (Client)
+GET {{baseUrl}}/api/loan-applications/2/status
+Authorization: Bearer {{accessToken}}
+

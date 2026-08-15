@@ -11,6 +11,7 @@ using TerraLink.Api.Services.Clients;
 using System.Text.Json.Serialization;
 using TerraLink.Api.Services.LoanProducts;
 using TerraLink.Api.Services.LoanApplications;
+using TerraLink.Api.Services.Loans;
 
 var builder = WebApplication.CreateBuilder(args);
 
