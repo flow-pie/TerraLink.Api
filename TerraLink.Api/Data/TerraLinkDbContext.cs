@@ -9,6 +9,7 @@ public class TerraLinkDbContext(DbContextOptions<TerraLinkDbContext> options) : 
     public DbSet<Models.User> Users => Set<Models.User>();
     public DbSet<Models.Role> Roles => Set<Models.Role>();
     public DbSet<Models.Client> Clients => Set<Models.Client>();
+    public DbSet<ClientAsset> ClientAssets { get; set; }
     public DbSet<Models.CreditHistory> CreditHistories => Set<Models.CreditHistory>();
     public DbSet<Models.KycDocument> KycDocuments => Set<Models.KycDocument>();
     public DbSet<Models.Group> Groups => Set<Models.Group>();
