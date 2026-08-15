@@ -359,3 +359,20 @@ Authorization: Bearer {{accessToken}}
 GET {{baseUrl}}/api/loan-applications/2/status
 Authorization: Bearer {{accessToken}}
 
+###############################################################################
+# Loans
+###############################################################################
+
+### List loans (Loan Officer)
+GET {{baseUrl}}/api/loans?status=ACTIVE&search=Amina&page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+### Get loan detail
+GET {{baseUrl}}/api/loans/1
+Authorization: Bearer {{accessToken}}
+
+### Get client loans
+GET {{baseUrl}}/api/loans/clients/9/loans
+Authorization: Bearer {{accessToken}}
+
+
