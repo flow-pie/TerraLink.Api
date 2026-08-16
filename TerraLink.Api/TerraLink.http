@@ -391,6 +391,83 @@ Authorization: Bearer {{accessToken}}
 
 
 ###############################################################################
+# Payments
+###############################################################################
+
+### Initiate M-Pesa payment
+POST {{baseUrl}}/api/payments/initiate
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "loanId": 1,
+  "scheduleId": 1,
+  "amount": 4250,
+  "phone": "0712345678"
+}
+
+### M-Pesa callback (public)
+POST {{baseUrl}}/api/payments/mpesa/callback
+Content-Type: application/json
+
+{
+  "CheckoutRequestID": "f165d396b4b04c639c7f74ad083e3736",
+  "ResultCode": 0,
+  "ResultDesc": "Success",
+  "CallbackMetadata": [
+    {"Name": "MpesaReceiptNumber", "Value": "SFC4X9K2P1"}
+  ]
+}
+
+### Get payment
+GET {{baseUrl}}/api/payments/1
+Authorization: Bearer {{accessToken}}
+
+### Get client payments
+GET {{baseUrl}}/api/payments/clients/9/payments?page=1&pageSize=20
+Authorization: Bearer {{accessToken}}
+
+
+###############################################################################
+# Disbursements
+###############################################################################
+
+### Initiate disbursement
+POST {{baseUrl}}/api/loans/1/disburse
+Authorization: Bearer {{accessToken}}
+
+### M-Pesa B2C callback (public)
+POST {{baseUrl}}/api/disbursements/mpesa/callback
+Content-Type: application/json
+
+{
+  "CheckoutRequestID": "f165d396b4b04c639c7f74ad083e3736",
+  "ResultCode": 0,
+  "ResultDesc": "Success",
+  "ResultParameters": [
+    {"Name": "TransactionID", "Value": "SFD8827K"}
+  ]
+}
+
+### Get disbursement
+GET {{baseUrl}}/api/disbursements/1
+Authorization: Bearer {{accessToken}}
+
+
+###############################################################################
+# Loan Closures
+###############################################################################
+
+### Close loan
+POST {{baseUrl}}/api/loans/1/close
+Authorization: Bearer {{accessToken}}
+
+### Get closure certificate PDF
+GET {{baseUrl}}/api/loans/loan-closures/1/certificate
+Authorization: Bearer {{accessToken}}
+
+
+###############################################################################
 # Credit Scoring
 ###############################################################################
 
@@ -430,6 +507,35 @@ Authorization: Bearer {{accessToken}}
 
 ### Get credit score
 GET {{baseUrl}}/api/clients/1/credit-score
+Authorization: Bearer {{accessToken}}
+
+
+###############################################################################
+# Reports
+###############################################################################
+
+### Portfolio summary
+GET {{baseUrl}}/api/reports/portfolio-summary
+Authorization: Bearer {{accessToken}}
+
+### CBK prudential return
+GET {{baseUrl}}/api/reports/cbk-prudential-return
+Authorization: Bearer {{accessToken}}
+
+### Arrears analysis
+GET {{baseUrl}}/api/reports/arrears-analysis
+Authorization: Bearer {{accessToken}}
+
+### Officer performance
+GET {{baseUrl}}/api/reports/officer-performance
+Authorization: Bearer {{accessToken}}
+
+### Export report
+GET {{baseUrl}}/api/reports/portfolio-summary/export?format=pdf
+Authorization: Bearer {{accessToken}}
+
+### Report schedules
+GET {{baseUrl}}/api/reports/report-schedules
 Authorization: Bearer {{accessToken}}
 
 
