@@ -390,3 +390,46 @@ GET {{baseUrl}}/api/loans/1/repayment-schedule/export
 Authorization: Bearer {{accessToken}}
 
 
+###############################################################################
+# Credit Scoring
+###############################################################################
+
+### Get credit history
+GET {{baseUrl}}/api/clients/9/credit-history
+Authorization: Bearer {{accessToken}}
+
+### Get client assets
+GET {{baseUrl}}/api/clients/9/assets
+Authorization: Bearer {{accessToken}}
+
+### Create asset
+POST {{baseUrl}}/api/clients/9/assets
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "assetType": "WATER_PUMP",
+  "description": "Petrol-powered irrigation pump",
+  "quantity": 1
+}
+
+### Get income assessments
+GET {{baseUrl}}/api/clients/9/income-assessments
+Authorization: Bearer {{accessToken}}
+
+### Create income assessment
+POST {{baseUrl}}/api/clients/loan-applications/2/income-assessment
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "businessRevenue": 55000,
+  "otherIncome": 12000,
+  "householdExpenses": 28500
+}
+
+### Get credit score
+GET {{baseUrl}}/api/clients/1/credit-score
+Authorization: Bearer {{accessToken}}
+
+

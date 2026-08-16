@@ -87,6 +87,7 @@ builder.Services.AddScoped<ILoanProductService, LoanProductService>();
 builder.Services.AddScoped<ILoanApplicationService, LoanApplicationService>();
 builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<IRepaymentScheduleService, RepaymentScheduleService>();
+builder.Services.AddScoped<ICreditScoringService, CreditScoringService>();
 
 builder.Services.AddAuthorization();
 
@@ -114,6 +115,7 @@ app.MapLoanProductEndpoints();
 app.MapLoanApplicationEndpoints();
 app.MapLoanEndpoints();
 app.MapRepaymentScheduleEndpoints();
+app.MapCreditScoringEndpoints();
 
 //perform database migration on startup
 app.DbMigrate();
