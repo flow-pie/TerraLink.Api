@@ -86,6 +86,7 @@ builder.Services.AddScoped<IKycDocumentService, KycDocumentService>();
 builder.Services.AddScoped<ILoanProductService, LoanProductService>();
 builder.Services.AddScoped<ILoanApplicationService, LoanApplicationService>();
 builder.Services.AddScoped<ILoanService, LoanService>();
+builder.Services.AddScoped<IRepaymentScheduleService, RepaymentScheduleService>();
 
 builder.Services.AddAuthorization();
 
@@ -112,6 +113,7 @@ app.MapKycEndpoints();
 app.MapLoanProductEndpoints();
 app.MapLoanApplicationEndpoints();
 app.MapLoanEndpoints();
+app.MapRepaymentScheduleEndpoints();
 
 //perform database migration on startup
 app.DbMigrate();

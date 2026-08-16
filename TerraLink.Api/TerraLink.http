@@ -359,6 +359,7 @@ Authorization: Bearer {{accessToken}}
 GET {{baseUrl}}/api/loan-applications/2/status
 Authorization: Bearer {{accessToken}}
 
+
 ###############################################################################
 # Loans
 ###############################################################################
@@ -373,6 +374,19 @@ Authorization: Bearer {{accessToken}}
 
 ### Get client loans
 GET {{baseUrl}}/api/loans/clients/9/loans
+Authorization: Bearer {{accessToken}}
+
+
+###############################################################################
+# Repayment Schedule
+###############################################################################
+
+### Get repayment schedule
+GET {{baseUrl}}/api/loans/1/repayment-schedule
+Authorization: Bearer {{accessToken}}
+
+### Export repayment schedule PDF
+GET {{baseUrl}}/api/loans/1/repayment-schedule/export
 Authorization: Bearer {{accessToken}}
 
 

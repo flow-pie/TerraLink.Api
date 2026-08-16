@@ -100,8 +100,11 @@ namespace TerraLink.Api.Models
 
     public enum LoanStatus
     {
+        PENDING_DISBURSEMENT,
         ACTIVE,
+        IN_ARREARS,
         COMPLETED,
+        CLOSED,
         DEFAULTED,
         WRITTEN_OFF
     }
